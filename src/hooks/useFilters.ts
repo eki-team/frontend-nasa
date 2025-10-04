@@ -11,8 +11,11 @@ export const useFilters = () => {
   useEffect(() => {
     const urlFilters: Partial<SearchFilters> = {};
     
-    const q = searchParams.get("q");
-    if (q) urlFilters.q = q;
+    const q = searchParams.get("q") || searchParams.get("query");
+    if (q) {
+      urlFilters.q = q;
+      urlFilters.query = q; // Soportar ambos formatos
+    }
     
     const yearFrom = searchParams.get("yearFrom");
     if (yearFrom) urlFilters.yearFrom = parseInt(yearFrom);
@@ -41,7 +44,8 @@ export const useFilters = () => {
   useEffect(() => {
     const params = new URLSearchParams();
     
-    if (filters.q) params.set("q", filters.q);
+    const query = filters.query || filters.q;
+    if (query) params.set("query", query);
     if (filters.yearFrom) params.set("yearFrom", filters.yearFrom.toString());
     if (filters.yearTo) params.set("yearTo", filters.yearTo.toString());
     if (filters.mission) params.set("mission", filters.mission);

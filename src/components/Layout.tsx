@@ -1,7 +1,8 @@
-import { Moon, Sun, Globe } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { useUiStore } from "@/store/useUiStore";
 import { cn } from "@/lib/utils";
 
@@ -10,14 +11,9 @@ interface LayoutProps {
 }
 
 export const Layout = ({ children }: LayoutProps) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const location = useLocation();
   const { theme, toggleTheme } = useUiStore();
-
-  const toggleLanguage = () => {
-    const newLang = i18n.language === "en" ? "es" : "en";
-    i18n.changeLanguage(newLang);
-  };
 
   const navItems = [
     { path: "/", label: t("nav.dashboard") },
@@ -56,14 +52,7 @@ export const Layout = ({ children }: LayoutProps) => {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleLanguage}
-                aria-label="Toggle language"
-              >
-                <Globe className="h-5 w-5" />
-              </Button>
+              <LanguageSelector />
               
               <Button
                 variant="ghost"

@@ -3,21 +3,26 @@ export type OutcomeType = "positive" | "negative" | "mixed" | "inconclusive";
 export interface Study {
   id: string;
   title: string;
-  year: number;
+  year: number | null;
   mission?: string;
-  species?: string[];
+  species?: string | string[];
   outcomes?: OutcomeType[];
   summary?: string;
   keywords?: string[];
   authors?: string[];
-  doi?: string;
+  doi?: string | null;
+  abstract?: string;
+  citations?: number;
+  relevanceScore?: number;
 }
 
 export interface SearchResponse {
-  items: Study[];
+  studies: Study[]; // Cambio: items → studies
   total: number;
   page: number;
   pageSize: number;
+  totalPages: number;
+  hasMore: boolean;
 }
 
 export interface StudyDetail extends Study {
@@ -55,7 +60,8 @@ export interface Insights {
 }
 
 export interface SearchFilters {
-  q?: string;
+  query?: string; // Cambio: q → query
+  q?: string; // Mantener q para compatibilidad
   yearFrom?: number;
   yearTo?: number;
   mission?: string;

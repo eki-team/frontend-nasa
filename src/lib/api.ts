@@ -6,10 +6,16 @@ import {
   SearchFilters,
   KpiData 
 } from "./types";
+import { 
+  searchWithFrontendFilters, 
+  ChatResponse, 
+  Source,
+  healthCheck 
+} from "./api-rag";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
-// Helper to build query string
+// Helper to build query string (mantenido para compatibilidad)
 const buildQueryString = (params: Record<string, any>): string => {
   const query = new URLSearchParams();
   
@@ -26,16 +32,67 @@ const buildQueryString = (params: Record<string, any>): string => {
   return query.toString();
 };
 
-// Search studies
+// Helper para convertir respuesta RAG a formato frontend
+const convertRagResponseToSearchResponse = (
+  ragResponse: ChatResponse,
+  filters: SearchFilters
+): SearchResponse => {
+  const page = filters.page || 1;
+  const pageSize = filters.pageSize || 12;
+
+  // Convertir sources a estudios
+  const studies = ragResponse.sources.map((source: Source, index: number) => ({
+    id: `study-${Date.now()}-${index}`, // ID temporal
+    title: source.title,
+    authors: source.authors || [],
+    year: source.year || null,
+    abstract: source.chunk_text,
+    mission: filters.mission || "Unknown",
+    species: filters.species?.[0] || "Unknown",
+    outcomes: filters.outcome || [],
+    citations: Math.floor(source.score * 100), // Mock basado en score
+    doi: source.doi || null,
+    relevanceScore: source.score,
+  }));
+
+  return {
+    studies,
+    total: studies.length,
+    page,
+    pageSize,
+    totalPages: Math.ceil(studies.length / pageSize),
+    hasMore: false,
+  };
+};
+
+// Search studies - NUEVA IMPLEMENTACIÓN CON RAG
 export const searchStudies = async (filters: SearchFilters): Promise<SearchResponse> => {
-  const queryString = buildQueryString(filters);
-  const response = await fetch(`${API_BASE_URL}/search?${queryString}`);
-  
-  if (!response.ok) {
-    throw new Error(`Search failed: ${response.statusText}`);
+  try {
+    // Si no hay query, retornar vacío
+    if (!filters.query || filters.query.trim() === "") {
+      return {
+        studies: [],
+        total: 0,
+        page: filters.page || 1,
+        pageSize: filters.pageSize || 12,
+        totalPages: 0,
+        hasMore: false,
+      };
+    }
+
+    // Usar el nuevo cliente RAG
+    const ragResponse = await searchWithFrontendFilters(
+      filters.query,
+      filters,
+      filters.pageSize || 12
+    );
+
+    // Convertir respuesta RAG al formato esperado por el frontend
+    return convertRagResponseToSearchResponse(ragResponse, filters);
+  } catch (error) {
+    console.error("Search error:", error);
+    throw new Error(`Search failed: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
-  
-  return response.json();
 };
 
 // Get study detail
