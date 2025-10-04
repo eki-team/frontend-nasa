@@ -79,19 +79,35 @@ export interface RetrievalResponse {
  * Realiza una consulta al sistema RAG con filtros opcionales
  */
 export const chatQuery = async (request: ChatRequest): Promise<ChatResponse> => {
-  const response = await fetch(`${API_BASE_URL}/api/chat`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(request),
-  });
+  try {
+    const url = `${API_BASE_URL}/api/chat`;
+    console.log('[API] Sending request to:', url);
+    console.log('[API] Request payload:', JSON.stringify(request, null, 2));
 
-  if (!response.ok) {
-    throw new Error(`Chat query failed: ${response.statusText}`);
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+    });
+
+    console.log('[API] Response status:', response.status);
+    console.log('[API] Response headers:', Object.fromEntries(response.headers.entries()));
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[API] Error response:', errorText);
+      throw new Error(`Chat query failed: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('[API] Success response:', data);
+    return data;
+  } catch (error) {
+    console.error('[API] Exception:', error);
+    throw error;
   }
-
-  return response.json();
 };
 
 /**
