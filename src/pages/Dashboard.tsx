@@ -151,8 +151,8 @@ const Dashboard = () => {
             <div className="text-sm font-medium">
               {searchData && (
                 <span>
-                  {searchData.total} resultados
-                  {(filters.query || filters.q) && ` para "${filters.query || filters.q}"`}
+                  {searchData.total} {t("common.results")}
+                  {(filters.query || filters.q) && ` ${t("common.resultsFor")} "${filters.query || filters.q}"`}
                 </span>
               )}
             </div>

@@ -7,6 +7,8 @@ export const pt = {
     error: "Erro",
     noResults: "Nenhum resultado encontrado",
     noResultsMessage: "Tente ajustar seus filtros ou consulta de pesquisa.",
+    results: "resultados",
+    resultsFor: "resultados para",
     export: "Exportar",
     copyLink: "Copiar link"
   },

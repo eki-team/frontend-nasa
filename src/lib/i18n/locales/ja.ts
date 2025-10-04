@@ -7,6 +7,8 @@ export const ja = {
     error: "エラー",
     noResults: "結果が見つかりません",
     noResultsMessage: "フィルターまたは検索クエリを調整してみてください。",
+    results: "件の結果",
+    resultsFor: "件の結果:",
     export: "エクスポート",
     copyLink: "リンクをコピー"
   },

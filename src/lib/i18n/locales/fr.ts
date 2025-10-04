@@ -7,6 +7,8 @@ export const fr = {
     error: "Erreur",
     noResults: "Aucun résultat trouvé",
     noResultsMessage: "Essayez d'ajuster vos filtres ou votre requête de recherche.",
+    results: "résultats",
+    resultsFor: "résultats pour",
     export: "Exporter",
     copyLink: "Copier le lien"
   },
