@@ -5,9 +5,8 @@ import { SearchFilters } from "@/lib/types";
 export type LanguageCode = "en" | "es" | "fr" | "de" | "pt" | "ja" | "it";
 
 interface UiState {
-  // Theme
-  theme: "light" | "dark";
-  toggleTheme: () => void;
+  // Theme (always dark for space theme)
+  theme: "dark";
   
   // Language
   language: LanguageCode;
@@ -36,12 +35,8 @@ const defaultFilters: SearchFilters = {
 export const useUiStore = create<UiState>()(
   persist(
     (set) => ({
-      theme: "light",
-      toggleTheme: () => set((state) => {
-        const newTheme = state.theme === "light" ? "dark" : "light";
-        document.documentElement.classList.toggle("dark", newTheme === "dark");
-        return { theme: newTheme };
-      }),
+      // Always dark theme for space aesthetic
+      theme: "dark",
       
       language: "en",
       setLanguage: (lang) => set({ language: lang }),

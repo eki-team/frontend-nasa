@@ -1,11 +1,7 @@
-import { Moon, Sun } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { useUiStore } from "@/store/useUiStore";
-import { cn } from "@/lib/utils";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,7 +10,6 @@ interface LayoutProps {
 export const Layout = ({ children }: LayoutProps) => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { theme, toggleTheme } = useUiStore();
 
   // Parallax effect for earth background
   useEffect(() => {
@@ -50,20 +45,6 @@ export const Layout = ({ children }: LayoutProps) => {
 
             <div className="flex items-center gap-2">
               <LanguageSelector />
-              
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleTheme}
-                aria-label="Toggle theme"
-                className="text-white/90 hover:text-white hover:bg-white/10"
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-5 w-5" />
-                ) : (
-                  <Moon className="h-5 w-5" />
-                )}
-              </Button>
             </div>
           </div>
         </div>

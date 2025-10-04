@@ -24,11 +24,10 @@ const queryClient = new QueryClient({
 });
 
 const AppContent = () => {
-  const { theme } = useUiStore();
-
+  // Always use dark mode for space theme
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
+    document.documentElement.classList.add("dark");
+  }, []);
 
   return (
     <Layout>
