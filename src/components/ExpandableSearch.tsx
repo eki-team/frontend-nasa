@@ -156,7 +156,7 @@ export const ExpandableSearch = () => {
                 className="text-sm text-muted-foreground flex items-center justify-center gap-2"
               >
                 <ChevronDown className="h-4 w-4 animate-bounce" />
-                Haz clic para ver filtros avanzados
+                {t("dashboard.clickToSeeFilters")}
               </motion.p>
             </motion.div>
           )}
@@ -202,8 +202,8 @@ export const ExpandableSearch = () => {
                   <SlidersHorizontal className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold">Filtros Avanzados</h3>
-                  <p className="text-sm text-muted-foreground">Refina tu búsqueda con criterios específicos</p>
+                  <h3 className="text-lg font-semibold">{t("dashboard.advancedFilters")}</h3>
+                  <p className="text-sm text-muted-foreground">{t("dashboard.refineSearch")}</p>
                 </div>
               </div>
               

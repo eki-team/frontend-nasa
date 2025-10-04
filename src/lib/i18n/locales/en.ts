@@ -21,7 +21,10 @@ export const en = {
     totalStudies: "Total Studies",
     yearsCovered: "Years Covered",
     missions: "Missions",
-    species: "Species"
+    species: "Species",
+    advancedFilters: "Advanced Filters",
+    refineSearch: "Refine your search with specific criteria",
+    clickToSeeFilters: "Click to see advanced filters"
   },
   filters: {
     yearRange: "Year Range",

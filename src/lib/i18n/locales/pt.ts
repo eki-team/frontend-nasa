@@ -15,13 +15,16 @@ export const pt = {
     insights: "Análises e tendências"
   },
   dashboard: {
-    title: "Explorador de publicações de biociência NASA",
-    subtitle: "Explore 608 publicações de biociência das missões NASA",
+    title: "Explorador de Publicações Biocientíficas da NASA",
+    subtitle: "Explore 608 publicações de biociência das missões da NASA",
     searchPlaceholder: "Pesquisar por título, palavras-chave, espécies ou missão...",
-    totalStudies: "Total de estudos",
-    yearsCovered: "Anos cobertos",
+    totalStudies: "Total de Estudos",
+    yearsCovered: "Anos Cobertos",
     missions: "Missões",
-    species: "Espécies"
+    species: "Espécies",
+    advancedFilters: "Filtros Avançados",
+    refineSearch: "Refine sua pesquisa com critérios específicos",
+    clickToSeeFilters: "Clique para ver filtros avançados"
   },
   filters: {
     yearRange: "Intervalo de anos",

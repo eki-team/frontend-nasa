@@ -21,7 +21,10 @@ export const es = {
     totalStudies: "Total de Estudios",
     yearsCovered: "Años Cubiertos",
     missions: "Misiones",
-    species: "Especies"
+    species: "Especies",
+    advancedFilters: "Filtros Avanzados",
+    refineSearch: "Refina tu búsqueda con criterios específicos",
+    clickToSeeFilters: "Haz clic para ver filtros avanzados"
   },
   filters: {
     yearRange: "Rango de Años",

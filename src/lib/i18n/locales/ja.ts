@@ -21,7 +21,10 @@ export const ja = {
     totalStudies: "総研究数",
     yearsCovered: "対象年",
     missions: "ミッション",
-    species: "種"
+    species: "種",
+    advancedFilters: "詳細フィルター",
+    refineSearch: "特定の基準で検索を絞り込む",
+    clickToSeeFilters: "クリックして詳細フィルターを表示"
   },
   filters: {
     yearRange: "年の範囲",
