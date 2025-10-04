@@ -58,27 +58,21 @@ export const ExpandableSearch = ({ onSearch }: ExpandableSearchProps) => {
   return (
     <div ref={containerRef} className="w-full max-w-4xl mx-auto">
       {/* Main Search Bar */}
-      <motion.div 
-        className="relative"
-        animate={isFocused ? { scale: 1.01 } : { scale: 1 }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
-      >
-        <div className="relative">
-          <motion.div
-            animate={isFocused ? { scale: 1.2, rotate: 360 } : { scale: 1, rotate: 0 }}
-            transition={{ type: "spring", stiffness: 200, damping: 15 }}
-            className="absolute left-5 top-1/2 -translate-y-1/2 z-10"
-          >
+      <div className="relative">
+        <div className="relative flex items-center">
+          {/* Search Icon */}
+          <div className="absolute left-5 z-10 pointer-events-none">
             <Search className="h-5 w-5 text-primary" />
-          </motion.div>
+          </div>
           
+          {/* Sparkles Icon */}
           <AnimatePresence>
             {isFocused && (filters.query || filters.q) && (
               <motion.div
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
-                className="absolute right-20 top-1/2 -translate-y-1/2 z-10"
+                className="absolute right-20 z-10 pointer-events-none"
               >
                 <Sparkles className="h-4 w-4 text-accent animate-pulse" />
               </motion.div>
@@ -97,12 +91,8 @@ export const ExpandableSearch = ({ onSearch }: ExpandableSearchProps) => {
             className="pl-14 pr-16 h-14 text-base glass-card-light border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-300 rounded-full shadow-2xl cursor-pointer placeholder:text-muted-foreground hover:border-primary/30"
           />
 
-          {/* Filters Toggle Button - Ahora muestra estado */}
-          <motion.div
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
+          {/* Filters Toggle Button */}
+          <div className="absolute right-2 z-10">
             <Button
               variant="ghost"
               size="icon"
@@ -133,7 +123,7 @@ export const ExpandableSearch = ({ onSearch }: ExpandableSearchProps) => {
                 )}
               </AnimatePresence>
             </Button>
-          </motion.div>
+          </div>
           
           {/* Animated border on focus */}
           <AnimatePresence>
@@ -147,35 +137,35 @@ export const ExpandableSearch = ({ onSearch }: ExpandableSearchProps) => {
             )}
           </AnimatePresence>
         </div>
+      </div>
 
-        {/* Hint text - only show when filters are closed */}
-        <AnimatePresence>
-          {!showFilters && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ delay: 0.5 }}
-              className="text-center mt-3"
+      {/* Hint text - only show when filters are closed */}
+      <AnimatePresence>
+        {!showFilters && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ delay: 0.5 }}
+            className="text-center mt-3"
+          >
+            <motion.p
+              animate={{ 
+                opacity: [0.5, 0.8, 0.5],
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="text-sm text-white/60 flex items-center justify-center gap-2"
             >
-              <motion.p
-                animate={{ 
-                  opacity: [0.5, 0.8, 0.5],
-                }}
-                transition={{ 
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="text-sm text-white/60 flex items-center justify-center gap-2"
-              >
-                <ChevronDown className="h-4 w-4 animate-bounce" />
-                {t("dashboard.clickToSeeFilters")}
-              </motion.p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+              <ChevronDown className="h-4 w-4 animate-bounce" />
+              {t("dashboard.clickToSeeFilters")}
+            </motion.p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Expandable Filters Panel */}
       <AnimatePresence>

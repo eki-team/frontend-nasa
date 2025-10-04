@@ -18,7 +18,7 @@ export const fr = {
     insights: "Analyses et tendances"
   },
   dashboard: {
-    title: "Explorateur de publications de bioscience NASA",
+     title: "Nasa Intelligent Science Catalog Search",
     subtitle: "Explorez 608 publications de bioscience des missions NASA",
     searchPlaceholder: "Rechercher par titre, mots-clés, espèces ou mission...",
     totalStudies: "Total d'études",
