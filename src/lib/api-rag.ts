@@ -1,5 +1,9 @@
 // API client para el backend RAG de NASA
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+// In production (Vercel), use relative URL to leverage Vercel proxy
+// In development, use environment variable or localhost
+const API_BASE_URL = import.meta.env.PROD 
+  ? "" // Empty string = same origin, uses Vercel proxy
+  : (import.meta.env.VITE_API_BASE_URL || "http://localhost:8000");
 
 // ==================== TIPOS ====================
 
