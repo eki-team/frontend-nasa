@@ -18,7 +18,7 @@ export const it = {
     insights: "Analisi e tendenze"
   },
   dashboard: {
-    title: "Esploratore di pubblicazioni di bioscienza NASA",
+    title: "Nasa Intelligent Science Catalog Search",
     subtitle: "Esplora 608 pubblicazioni di bioscienza delle missioni NASA",
     searchPlaceholder: "Cerca per titolo, parole chiave, specie o missione...",
     totalStudies: "Totale studi",
@@ -74,5 +74,16 @@ export const it = {
     outcomeDistribution: "Distribuzione dei risultati",
     consensusVsDisagreement: "Consenso vs. disaccordo",
     entityOutcomeHeatmap: "Mappa termica entità-risultato"
+  },
+  chat: {
+    answer: "Risposta IA",
+    citations: "Fonti e citazioni",
+    retrieved: "Recuperati",
+    latency: "Latenza",
+    grounded: "Fondato",
+    viewSource: "Vedi fonte",
+    searching: "Ricerca...",
+    pressEnter: "Premi Invio per cercare",
+    minChars: "Minimo 3 caratteri richiesti"
   }
 };

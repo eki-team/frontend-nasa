@@ -27,13 +27,13 @@ export const MissionSelect = () => {
         value={filters.mission || "all"}
         onValueChange={(value) => setFilters({ mission: value === "all" ? undefined : value })}
       >
-        <SelectTrigger>
+        <SelectTrigger className="bg-background/50 border-border/50 hover:bg-accent/10 focus:ring-primary/20">
           <SelectValue placeholder={t("filters.allMissions")} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="glass-card border-border/50">
           <SelectItem value="all">{t("filters.allMissions")}</SelectItem>
           {MISSIONS.map((mission) => (
-            <SelectItem key={mission} value={mission}>
+            <SelectItem key={mission} value={mission} className="hover:bg-accent/10 focus:bg-accent/15">
               {mission}
             </SelectItem>
           ))}

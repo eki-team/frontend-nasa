@@ -13,7 +13,7 @@ export const FilterPanel = () => {
   const { resetFilters } = useUiStore();
 
   return (
-    <Card className="p-6 sticky top-24">
+    <Card className="p-6 sticky top-24 glass-card border-border/50">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <SlidersHorizontal className="h-5 w-5 text-primary" />
@@ -33,9 +33,9 @@ export const FilterPanel = () => {
 
       <div className="space-y-6">
         <YearRange />
-        <Separator />
+        <Separator className="bg-border/50" />
         <MissionSelect />
-        <Separator />
+        <Separator className="bg-border/50" />
         <OutcomeMultiSelect />
       </div>
     </Card>

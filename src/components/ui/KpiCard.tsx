@@ -37,10 +37,10 @@ export const KpiCard = ({ title, value, icon: Icon, isLoading }: KpiCardProps) =
 
   if (isLoading) {
     return (
-      <Card className="p-6">
-        <Skeleton className="h-12 w-12 rounded-lg mb-4" />
-        <Skeleton className="h-4 w-24 mb-2" />
-        <Skeleton className="h-8 w-16" />
+      <Card className="p-6 glass-card-light">
+        <Skeleton className="h-12 w-12 rounded-lg mb-4 bg-white/20" />
+        <Skeleton className="h-4 w-24 mb-2 bg-white/20" />
+        <Skeleton className="h-8 w-16 bg-white/20" />
       </Card>
     );
   }
@@ -50,10 +50,10 @@ export const KpiCard = ({ title, value, icon: Icon, isLoading }: KpiCardProps) =
       whileHover={{ scale: 1.03, y: -2 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
-      <Card className="p-6 bg-gradient-to-br from-card to-card/50 border-border/50 hover:border-primary/50 transition-all group relative overflow-hidden">
+      <Card className="p-6 glass-card-light hover:bg-accent/10 transition-all group relative overflow-hidden shadow-lg hover:shadow-2xl border-border/50">
         {/* Animated background gradient */}
         <motion.div
-          className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100"
+          className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 opacity-0 group-hover:opacity-100"
           initial={{ opacity: 0 }}
           whileHover={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
@@ -62,20 +62,20 @@ export const KpiCard = ({ title, value, icon: Icon, isLoading }: KpiCardProps) =
         <div className="relative z-10">
           <div className="flex items-start justify-between mb-4">
             <motion.div 
-              className="p-3 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors"
+              className="p-3 rounded-lg bg-gradient-to-br from-primary/30 to-accent/30 backdrop-blur-sm border border-border/50 shadow-lg"
               whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.1 }}
               transition={{ duration: 0.5 }}
             >
-              <Icon className="h-6 w-6" />
+              <Icon className="h-6 w-6 text-accent drop-shadow-lg" />
             </motion.div>
           </div>
           
-          <h3 className="text-sm font-medium text-muted-foreground mb-1">
+          <h3 className="text-sm font-bold text-foreground/90 mb-1 uppercase tracking-wider">
             {title}
           </h3>
           
           <motion.p 
-            className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent"
+            className="text-3xl font-bold text-foreground drop-shadow-lg tracking-tight"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}

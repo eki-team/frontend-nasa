@@ -18,7 +18,7 @@ export const ja = {
     insights: "分析とトレンド"
   },
   dashboard: {
-    title: "NASA バイオサイエンス出版物エクスプローラー",
+      title: "Nasa Intelligent Science Catalog Search",
     subtitle: "NASAミッションの608のバイオサイエンス出版物を探索",
     searchPlaceholder: "タイトル、キーワード、種、ミッションで検索...",
     totalStudies: "総研究数",
@@ -74,5 +74,16 @@ export const ja = {
     outcomeDistribution: "結果の分布",
     consensusVsDisagreement: "コンセンサス vs. 不一致",
     entityOutcomeHeatmap: "エンティティ結果ヒートマップ"
+  },
+  chat: {
+    answer: "AI回答",
+    citations: "情報源と引用",
+    retrieved: "取得済み",
+    latency: "レイテンシ",
+    grounded: "根拠あり",
+    viewSource: "ソースを表示",
+    searching: "検索中...",
+    pressEnter: "Enterキーを押して検索",
+    minChars: "最低3文字必要"
   }
 };

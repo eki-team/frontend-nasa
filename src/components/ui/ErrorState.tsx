@@ -12,8 +12,8 @@ export const ErrorState = ({ message, onRetry }: ErrorStateProps) => {
 
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4">
-      <div className="p-4 rounded-full bg-destructive/10 mb-4">
-        <AlertCircle className="h-12 w-12 text-destructive" />
+      <div className="p-4 rounded-full bg-gradient-to-br from-red-500/30 to-pink-500/30 backdrop-blur-sm border border-red-400/30 mb-4 shadow-lg">
+        <AlertCircle className="h-12 w-12 text-red-300 drop-shadow-lg" />
       </div>
       
       <h3 className="text-lg font-semibold mb-2">{t("common.error")}</h3>

@@ -74,5 +74,16 @@ export const fr = {
     outcomeDistribution: "Distribution des résultats",
     consensusVsDisagreement: "Consensus vs. désaccord",
     entityOutcomeHeatmap: "Carte thermique entité-résultat"
+  },
+  chat: {
+    answer: "Réponse IA",
+    citations: "Sources et citations",
+    retrieved: "Récupéré",
+    latency: "Latence",
+    grounded: "Fondé",
+    viewSource: "Voir la source",
+    searching: "Recherche...",
+    pressEnter: "Appuyez sur Entrée pour rechercher",
+    minChars: "Minimum 3 caractères requis"
   }
 };

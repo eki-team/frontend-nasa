@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -84,13 +86,81 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    background-color: #000814;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: transparent;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', 'Space Grotesk', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.02em;
   }
 }
 
 /* Custom animations */
 @layer utilities {
+  /* Earth Background */
+  /* Earth Background with Parallax */
+  .earth-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 120%;
+    z-index: -1;
+    background-image: url('/images/earth-space-earth-view-from-space-space-wallpaper-backdrop_1115748-610.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    will-change: transform;
+    transition: transform 0.1s ease-out;
+  }
+
+  /* Overlay oscuro para ambos modos (dark y light) */
+  .earth-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 20, 0.4) 0%,
+      rgba(0, 0, 40, 0.6) 50%,
+      rgba(0, 0, 20, 0.8) 100%
+    );
+    backdrop-filter: brightness(0.7);
+  }
+
+  /* Glassmorphism effects */
+  .glass-card {
+    background: rgba(0, 0, 20, 0.5);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  }
+
+  .glass-card-light {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  .glass-header {
+    background: rgba(0, 0, 30, 0.6);
+    backdrop-filter: blur(30px) saturate(200%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
   @keyframes gradient-shift {
     0%, 100% {
       background-position: 0% 50%;
@@ -164,5 +234,111 @@ All colors MUST be HSL.
   .hover-lift:hover {
     transform: translateY(-4px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Fade-In Glitch Animation */
+  .glitch-title {
+    animation: glitchFadeIn 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    position: relative;
+    display: inline-block;
+    overflow: visible;
+    padding: 0.25rem 0;
+  }
+
+  .glitch-title::before,
+  .glitch-title::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    overflow: visible;
+  }
+
+  .glitch-title::before {
+    animation: glitchBefore 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    color: rgba(147, 197, 253, 0.8);
+    z-index: -1;
+  }
+
+  .glitch-title::after {
+    animation: glitchAfter 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    color: rgba(34, 211, 238, 0.8);
+    z-index: -2;
+  }
+
+  @keyframes glitchFadeIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.95);
+      filter: blur(10px);
+    }
+    20% {
+      opacity: 0.3;
+    }
+    40% {
+      opacity: 0.5;
+      transform: scale(0.98);
+      filter: blur(5px);
+    }
+    60% {
+      opacity: 0.7;
+    }
+    80% {
+      opacity: 0.9;
+      transform: scale(1.01);
+      filter: blur(0px);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+      filter: blur(0px);
+    }
+  }
+
+  @keyframes glitchBefore {
+    0%, 100% {
+      opacity: 0;
+      transform: translate(0);
+    }
+    10% {
+      opacity: 0.7;
+      transform: translate(-2px, -2px);
+    }
+    20% {
+      opacity: 0;
+      transform: translate(0);
+    }
+    30% {
+      opacity: 0.6;
+      transform: translate(3px, 2px);
+    }
+    40% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes glitchAfter {
+    0%, 100% {
+      opacity: 0;
+      transform: translate(0);
+    }
+    15% {
+      opacity: 0.6;
+      transform: translate(2px, 2px);
+    }
+    25% {
+      opacity: 0;
+      transform: translate(0);
+    }
+    35% {
+      opacity: 0.5;
+      transform: translate(-3px, -2px);
+    }
+    45% {
+      opacity: 0;
+    }
   }
 }

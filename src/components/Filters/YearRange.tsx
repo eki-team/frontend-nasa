@@ -22,7 +22,7 @@ export const YearRange = () => {
             placeholder="1990"
             value={filters.yearFrom || ""}
             onChange={(e) => setFilters({ yearFrom: e.target.value ? parseInt(e.target.value) : undefined })}
-            className="mt-1"
+            className="mt-1 bg-background/50 border-border/50 placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20"
           />
         </div>
         
@@ -36,7 +36,7 @@ export const YearRange = () => {
             placeholder="2024"
             value={filters.yearTo || ""}
             onChange={(e) => setFilters({ yearTo: e.target.value ? parseInt(e.target.value) : undefined })}
-            className="mt-1"
+            className="mt-1 bg-background/50 border-border/50 placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20"
           />
         </div>
       </div>

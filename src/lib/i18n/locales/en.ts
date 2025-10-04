@@ -74,5 +74,16 @@ export const en = {
     outcomeDistribution: "Outcome Distribution",
     consensusVsDisagreement: "Consensus vs. Disagreement",
     entityOutcomeHeatmap: "Entity-Outcome Heatmap"
+  },
+  chat: {
+    answer: "AI Answer",
+    citations: "Sources & Citations",
+    retrieved: "Retrieved",
+    latency: "Latency",
+    grounded: "Grounded",
+    viewSource: "View Source",
+    searching: "Searching...",
+    pressEnter: "Press Enter to search",
+    minChars: "Minimum 3 characters required"
   }
 };

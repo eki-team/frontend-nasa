@@ -46,7 +46,7 @@ export const LanguageSelector = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="relative"
+          className="relative text-white/90 hover:text-white hover:bg-white/10"
           aria-label="Select language"
         >
           <Globe className="h-5 w-5" />

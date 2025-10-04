@@ -11,15 +11,36 @@ export interface ChatRequest {
     exposure?: string[];
     system?: string[];
     year_range?: [number, number];
+    tissue?: string[];
+    assay?: string[];
   };
   top_k?: number;
+  session_id?: string;
+}
+
+export interface Citation {
+  source_id: string;
+  doi?: string;
+  osdr_id?: string;
+  section?: string;
+  snippet: string;
+  url?: string;
+  title: string;
+  year?: number;
 }
 
 export interface ChatResponse {
   answer: string;
-  sources: Source[];
-  query: string;
-  filters_applied?: any;
+  citations: Citation[];
+  used_filters?: any;
+  metrics?: {
+    latency_ms: number;
+    retrieved_k: number;
+    grounded_ratio: number;
+    dedup_count: number;
+    section_distribution?: Record<string, number>;
+  };
+  session_id?: string;
 }
 
 export interface Source {

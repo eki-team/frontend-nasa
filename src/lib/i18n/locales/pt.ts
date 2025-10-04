@@ -18,7 +18,7 @@ export const pt = {
     insights: "Análises e tendências"
   },
   dashboard: {
-    title: "Explorador de Publicações Biocientíficas da NASA",
+     title: "Nasa Intelligent Science Catalog Search",
     subtitle: "Explore 608 publicações de biociência das missões da NASA",
     searchPlaceholder: "Pesquisar por título, palavras-chave, espécies ou missão...",
     totalStudies: "Total de Estudos",
@@ -74,5 +74,16 @@ export const pt = {
     outcomeDistribution: "Distribuição de resultados",
     consensusVsDisagreement: "Consenso vs. desacordo",
     entityOutcomeHeatmap: "Mapa de calor entidade-resultado"
+  },
+  chat: {
+    answer: "Resposta IA",
+    citations: "Fontes e citações",
+    retrieved: "Recuperados",
+    latency: "Latência",
+    grounded: "Fundamentado",
+    viewSource: "Ver fonte",
+    searching: "Pesquisando...",
+    pressEnter: "Pressione Enter para pesquisar",
+    minChars: "Mínimo 3 caracteres necessários"
   }
 };

@@ -7,7 +7,11 @@ import { Button } from "@/components/ui/button";
 import { FilterPanel } from "@/components/Filters/FilterPanel";
 import { useUiStore } from "@/store/useUiStore";
 
-export const ExpandableSearch = () => {
+interface ExpandableSearchProps {
+  onSearch?: (query: string) => void;
+}
+
+export const ExpandableSearch = ({ onSearch }: ExpandableSearchProps) => {
   const { t } = useTranslation();
   const { filters, setFilters } = useUiStore();
   const [isFocused, setIsFocused] = useState(false);
@@ -17,6 +21,15 @@ export const ExpandableSearch = () => {
 
   const handleSearch = (value: string) => {
     setFilters({ query: value, q: value, page: 1 }); // Soportar ambos formatos
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && onSearch) {
+      const query = filters.query || filters.q || "";
+      if (query.trim().length >= 3) {
+        onSearch(query);
+      }
+    }
   };
 
   const handleInputClick = () => {
@@ -54,7 +67,7 @@ export const ExpandableSearch = () => {
           <motion.div
             animate={isFocused ? { scale: 1.2, rotate: 360 } : { scale: 1, rotate: 0 }}
             transition={{ type: "spring", stiffness: 200, damping: 15 }}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-10"
+            className="absolute left-5 top-1/2 -translate-y-1/2 z-10"
           >
             <Search className="h-5 w-5 text-primary" />
           </motion.div>
@@ -77,10 +90,11 @@ export const ExpandableSearch = () => {
             placeholder={t("dashboard.searchPlaceholder")}
             value={filters.query || filters.q || ""}
             onChange={(e) => handleSearch(e.target.value)}
+            onKeyDown={handleKeyDown}
             onClick={handleInputClick}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className="pl-12 pr-16 h-16 text-lg bg-card border-2 border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300 rounded-2xl shadow-lg cursor-pointer"
+            className="pl-14 pr-16 h-14 text-base glass-card-light border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-300 rounded-full shadow-2xl cursor-pointer placeholder:text-muted-foreground hover:border-primary/30"
           />
 
           {/* Filters Toggle Button - Ahora muestra estado */}
@@ -90,10 +104,10 @@ export const ExpandableSearch = () => {
             whileTap={{ scale: 0.95 }}
           >
             <Button
-              variant={showFilters ? "default" : "ghost"}
+              variant="ghost"
               size="icon"
               onClick={toggleFilters}
-              className="h-12 w-12 rounded-xl"
+              className="h-10 w-10 rounded-full hover:bg-accent/10 border border-border/30"
             >
               <AnimatePresence mode="wait">
                 {showFilters ? (
@@ -104,7 +118,7 @@ export const ExpandableSearch = () => {
                     exit={{ rotate: 90, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <X className="h-5 w-5" />
+                    <X className="h-4 w-4" />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -114,7 +128,7 @@ export const ExpandableSearch = () => {
                     exit={{ rotate: 90, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <ChevronDown className="h-5 w-5" />
+                    <ChevronDown className="h-4 w-4" />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -128,7 +142,7 @@ export const ExpandableSearch = () => {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 to-accent/20 blur-xl -z-10"
+                className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/30 to-accent/30 blur-xl -z-10"
               />
             )}
           </AnimatePresence>
@@ -153,7 +167,7 @@ export const ExpandableSearch = () => {
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="text-sm text-muted-foreground flex items-center justify-center gap-2"
+                className="text-sm text-white/60 flex items-center justify-center gap-2"
               >
                 <ChevronDown className="h-4 w-4 animate-bounce" />
                 {t("dashboard.clickToSeeFilters")}

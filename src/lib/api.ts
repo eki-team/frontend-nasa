@@ -40,19 +40,19 @@ const convertRagResponseToSearchResponse = (
   const page = filters.page || 1;
   const pageSize = filters.pageSize || 12;
 
-  // Convertir sources a estudios
-  const studies = ragResponse.sources.map((source: Source, index: number) => ({
-    id: `study-${Date.now()}-${index}`, // ID temporal
-    title: source.title,
-    authors: source.authors || [],
-    year: source.year || null,
-    abstract: source.chunk_text,
-    mission: filters.mission || "Unknown",
+  // Convertir citations a estudios
+  const studies = ragResponse.citations.map((citation, index: number) => ({
+    id: citation.source_id || `study-${Date.now()}-${index}`, // ID temporal
+    title: citation.title,
+    authors: [], // Las citations no tienen authors en la nueva estructura
+    year: citation.year || null,
+    abstract: citation.snippet,
+    mission: citation.osdr_id || filters.mission || "Unknown",
     species: filters.species?.[0] || "Unknown",
     outcomes: filters.outcome || [],
-    citations: Math.floor(source.score * 100), // Mock basado en score
-    doi: source.doi || null,
-    relevanceScore: source.score,
+    citations: 0, // Mock 
+    doi: citation.doi || null,
+    relevanceScore: 0.95, // Mock score
   }));
 
   return {

@@ -12,13 +12,13 @@ interface StudyCardProps {
 const getOutcomeColor = (outcome: string) => {
   switch (outcome) {
     case "positive":
-      return "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20";
+      return "bg-green-500/20 text-green-300 border-green-400/30";
     case "negative":
-      return "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20";
+      return "bg-red-500/20 text-red-300 border-red-400/30";
     case "mixed":
-      return "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20";
+      return "bg-yellow-500/20 text-yellow-300 border-yellow-400/30";
     default:
-      return "bg-muted text-muted-foreground border-border";
+      return "bg-white/10 text-white/80 border-white/20";
   }
 };
 
@@ -30,10 +30,10 @@ export const StudyCard = ({ study }: StudyCardProps) => {
         whileTap={{ scale: 0.98 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
       >
-        <Card className="p-6 h-full hover:border-primary/50 hover:shadow-lg transition-all group cursor-pointer relative overflow-hidden">
+        <Card className="p-6 h-full glass-card-light hover:bg-accent/10 hover:shadow-2xl transition-all group cursor-pointer relative overflow-hidden border-border/50">
           {/* Animated background on hover */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             initial={{ opacity: 0 }}
             whileHover={{ opacity: 1 }}
           />
@@ -51,12 +51,12 @@ export const StudyCard = ({ study }: StudyCardProps) => {
               )}
             </div>
 
-            <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+            <div className="flex flex-wrap gap-3 text-sm text-foreground/80">
               <motion.div 
                 className="flex items-center gap-1"
                 whileHover={{ scale: 1.1 }}
               >
-                <Calendar className="h-4 w-4" />
+                <Calendar className="h-4 w-4 text-accent" />
                 <span>{study.year}</span>
               </motion.div>
               
@@ -65,7 +65,7 @@ export const StudyCard = ({ study }: StudyCardProps) => {
                   className="flex items-center gap-1"
                   whileHover={{ scale: 1.1 }}
                 >
-                  <FileText className="h-4 w-4" />
+                  <FileText className="h-4 w-4 text-purple-400" />
                   <span>{study.mission}</span>
                 </motion.div>
               )}
@@ -96,7 +96,7 @@ export const StudyCard = ({ study }: StudyCardProps) => {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: (study.outcomes?.length || 0) * 0.1 + index * 0.1 }}
                   >
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge variant="secondary" className="text-xs bg-white/10 text-pink-300 border-pink-400/30">
                       <Tag className="h-3 w-3 mr-1" />
                       {keyword}
                     </Badge>

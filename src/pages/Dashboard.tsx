@@ -9,7 +9,9 @@ import { Pagination } from "@/components/Results/Pagination";
 import { KpiCard } from "@/components/ui/KpiCard";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { ChatResult } from "@/components/ChatResult";
 import { searchStudies, getKpiData, exportToCSV, exportToJSON } from "@/lib/api";
+import { useChatRag } from "@/hooks/useChatRag";
 import { useFilters } from "@/hooks/useFilters";
 import { useDeepLink } from "@/hooks/useDeepLink";
 
@@ -17,6 +19,7 @@ const Dashboard = () => {
   const { t } = useTranslation();
   const { filters } = useFilters();
   const { copyCurrentUrl } = useDeepLink();
+  const { sendQuery, currentResponse, isLoading: isChatLoading } = useChatRag();
 
   const { data: searchData, isLoading: isLoadingSearch, error: searchError, refetch } = useQuery({
     queryKey: ["search", filters],
@@ -28,6 +31,10 @@ const Dashboard = () => {
     queryFn: getKpiData
   });
 
+  const handleChatSearch = (query: string) => {
+    sendQuery(query);
+  };
+
   const handleExportCSV = () => {
     if (searchData?.studies) {
       exportToCSV(searchData.studies, "nasa-bio-studies.csv");
@@ -38,7 +45,7 @@ const Dashboard = () => {
     if (searchData?.studies) {
       exportToJSON(searchData.studies, "nasa-bio-studies.json");
     }
-  };
+   };
 
   return (
     <div className="space-y-8">
@@ -47,38 +54,52 @@ const Dashboard = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="text-center space-y-8 py-20 md:py-32 relative overflow-hidden min-h-[60vh] flex flex-col items-center justify-center"
+        className="text-center space-y-4 py-16 md:py-24 relative overflow-hidden min-h-[50vh] flex flex-col items-center justify-center"
       >
         {/* Subtle Background decoration */}
         <div className="absolute inset-0 -z-10">
           <motion.div
             animate={{
               scale: [1, 1.1, 1],
-              opacity: [0.3, 0.5, 0.3],
+              opacity: [0.2, 0.4, 0.2],
             }}
             transition={{
               duration: 8,
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-primary/10 via-accent/10 to-primary/10 rounded-full blur-3xl"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-primary/20 via-accent/20 to-primary/20 rounded-full blur-3xl"
           />
         </div>
 
-        <motion.h1 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.8 }}
-          className="text-6xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent mb-6"
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.3 }}
+          className="mb-3 px-4"
         >
-          {t("dashboard.title")}
-        </motion.h1>
+          <h1 
+            data-text="NISCS"
+            className="text-5xl md:text-6xl lg:text-7xl font-light bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent drop-shadow-2xl glitch-title leading-relaxed py-2"
+          >
+            NISCS
+          </h1>
+        </motion.div>
         
         <motion.p 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.8 }}
-          className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-12 px-4"
+          className="text-xl md:text-2xl text-foreground/80 max-w-3xl mx-auto mb-2 px-4 font-light drop-shadow-lg"
+        >
+          {t("dashboard.title")}
+        </motion.p>
+
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+          className="text-base md:text-lg text-foreground/60 max-w-2xl mx-auto mb-6 px-4 font-light drop-shadow-lg"
         >
           {t("dashboard.subtitle")}
         </motion.p>
@@ -89,10 +110,42 @@ const Dashboard = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.6 }}
-        className="max-w-4xl mx-auto px-4 -mt-20 relative z-10"
+        className="max-w-4xl mx-auto px-4 -mt-32 relative z-10"
       >
-        <ExpandableSearch />
+        <ExpandableSearch onSearch={handleChatSearch} />
+        
+        {/* Show hint about pressing Enter */}
+        {!currentResponse && (
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center mt-3 text-sm text-white/60"
+          >
+            {t("chat.pressEnter")}
+          </motion.p>
+        )}
       </motion.div>
+
+      {/* Chat RAG Results */}
+      <AnimatePresence mode="wait">
+        {isChatLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex justify-center items-center py-12"
+          >
+            <div className="flex items-center gap-3 text-cyan-300">
+              <Sparkles className="h-6 w-6 animate-spin" />
+              <span className="text-lg">{t("chat.searching")}</span>
+            </div>
+          </motion.div>
+        )}
+
+        {currentResponse && !isChatLoading && (
+          <ChatResult response={currentResponse} />
+        )}
+      </AnimatePresence>
 
       {/* KPIs with stagger animation - Only show when there are results */}
       {(searchData || filters.query || filters.q) && (
@@ -145,10 +198,10 @@ const Dashboard = () => {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.9 }}
-          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-card/50 backdrop-blur-sm border rounded-xl p-4"
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 glass-card-light rounded-xl p-4 shadow-xl"
         >
           <div className="space-y-1">
-            <div className="text-sm font-medium">
+            <div className="text-sm font-bold text-white drop-shadow-lg">
               {searchData && (
                 <span>
                   {searchData.total} {t("common.results")}
@@ -159,17 +212,17 @@ const Dashboard = () => {
           </div>
 
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={copyCurrentUrl}>
+            <Button variant="outline" size="sm" onClick={copyCurrentUrl} className="bg-white/10 hover:bg-white/20 text-white border-white/20 hover:border-white/30 font-medium">
               <Link2 className="h-4 w-4 mr-1" />
               {t("common.copyLink")}
             </Button>
             
-            <Button variant="outline" size="sm" onClick={handleExportCSV}>
+            <Button variant="outline" size="sm" onClick={handleExportCSV} className="bg-white/10 hover:bg-white/20 text-white border-white/20 hover:border-white/30 font-medium">
               <Download className="h-4 w-4 mr-1" />
               CSV
             </Button>
             
-            <Button variant="outline" size="sm" onClick={handleExportJSON}>
+            <Button variant="outline" size="sm" onClick={handleExportJSON} className="bg-white/10 hover:bg-white/20 text-white border-white/20 hover:border-white/30 font-medium">
               <Download className="h-4 w-4 mr-1" />
               JSON
             </Button>
