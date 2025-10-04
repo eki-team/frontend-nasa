@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Search, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/UI/input";
 import { useUiStore } from "@/store/useUiStore";
 
 export const SearchBar = () => {
@@ -11,7 +11,7 @@ export const SearchBar = () => {
   const [isFocused, setIsFocused] = useState(false);
 
   const handleSearch = (value: string) => {
-    setFilters({ q: value, page: 1 });
+    setFilters({ query: value, q: value, page: 1 }); // Soportar ambos formatos
   };
 
   return (
@@ -29,7 +29,7 @@ export const SearchBar = () => {
       </motion.div>
       
       <AnimatePresence>
-        {isFocused && filters.q && (
+        {isFocused && (filters.query || filters.q) && (
           <motion.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
@@ -44,7 +44,7 @@ export const SearchBar = () => {
       <Input
         type="text"
         placeholder={t("dashboard.searchPlaceholder")}
-        value={filters.q || ""}
+        value={filters.query || filters.q || ""}
         onChange={(e) => handleSearch(e.target.value)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}

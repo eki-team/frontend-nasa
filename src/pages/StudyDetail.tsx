@@ -2,11 +2,11 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, Calendar, Rocket, FlaskConical, Tag, FileText } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/UI/button";
+import { Card } from "@/components/UI/card";
+import { Badge } from "@/components/UI/badge";
+import { Separator } from "@/components/UI/separator";
+import { Skeleton } from "@/components/UI/skeleton";
 import { StudyCard } from "@/components/Results/StudyCard";
 import { ErrorState } from "@/components/UI/ErrorState";
 import { getStudyById } from "@/lib/api";
@@ -62,10 +62,10 @@ const StudyDetail = () => {
             </div>
           )}
           
-          {study.species && study.species.length > 0 && (
+          {study.species && (
             <div className="flex items-center gap-2">
               <FlaskConical className="h-5 w-5" />
-              <span>{study.species.join(", ")}</span>
+              <span>{Array.isArray(study.species) ? study.species.join(", ") : study.species}</span>
             </div>
           )}
         </div>

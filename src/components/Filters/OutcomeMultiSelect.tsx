@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/UI/label";
+import { Checkbox } from "@/components/UI/checkbox";
 import { useUiStore } from "@/store/useUiStore";
 import { OutcomeType } from "@/lib/types";
 

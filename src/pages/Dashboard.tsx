@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, Calendar, Rocket, FlaskConical, Download, Link2, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/UI/button";
 import { ExpandableSearch } from "@/components/ExpandableSearch";
 import { StudiesGrid } from "@/components/Results/StudiesGrid";
 import { Pagination } from "@/components/Results/Pagination";

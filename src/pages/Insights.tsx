@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
-import { Card } from "@/components/ui/card";
+import { Card } from "@/components/UI/card";
 import { ErrorState } from "@/components/UI/ErrorState";
 import { getInsights } from "@/lib/api";
 
