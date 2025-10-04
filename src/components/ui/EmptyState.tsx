@@ -17,7 +17,7 @@ export const EmptyState = ({ message }: EmptyStateProps) => {
       <h3 className="text-lg font-semibold mb-2">{t("common.noResults")}</h3>
       
       <p className="text-muted-foreground text-center max-w-md">
-        {message || "Try adjusting your filters or search query."}
+        {message || t("common.noResultsMessage")}
       </p>
     </div>
   );

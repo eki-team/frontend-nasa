@@ -6,6 +6,7 @@ export const ja = {
     loading: "読み込み中...",
     error: "エラー",
     noResults: "結果が見つかりません",
+    noResultsMessage: "フィルターまたは検索クエリを調整してみてください。",
     export: "エクスポート",
     copyLink: "リンクをコピー"
   },

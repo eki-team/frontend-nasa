@@ -6,6 +6,7 @@ export const pt = {
     loading: "Carregando...",
     error: "Erro",
     noResults: "Nenhum resultado encontrado",
+    noResultsMessage: "Tente ajustar seus filtros ou consulta de pesquisa.",
     export: "Exportar",
     copyLink: "Copiar link"
   },

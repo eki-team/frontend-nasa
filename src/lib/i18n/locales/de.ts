@@ -6,6 +6,7 @@ export const de = {
     loading: "Laden...",
     error: "Fehler",
     noResults: "Keine Ergebnisse gefunden",
+    noResultsMessage: "Versuchen Sie, Ihre Filter oder Suchanfrage anzupassen.",
     export: "Exportieren",
     copyLink: "Link kopieren"
   },

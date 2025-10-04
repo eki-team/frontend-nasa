@@ -6,6 +6,7 @@ export const it = {
     loading: "Caricamento...",
     error: "Errore",
     noResults: "Nessun risultato trovato",
+    noResultsMessage: "Prova a modificare i filtri o la query di ricerca.",
     export: "Esporta",
     copyLink: "Copia link"
   },
