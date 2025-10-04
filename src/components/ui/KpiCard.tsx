@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { LucideIcon } from "lucide-react";
-import { Card } from "@/components/UI/card";
-import { Skeleton } from "@/components/UI/skeleton";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface KpiCardProps {
   title: string;

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Search, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Input } from "@/components/UI/input";
+import { Input } from "@/components/ui/input";
 import { useUiStore } from "@/store/useUiStore";
 
 export const SearchBar = () => {

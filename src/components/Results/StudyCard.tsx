@@ -1,8 +1,8 @@
 import { Calendar, FileText, Tag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Card } from "@/components/UI/card";
-import { Badge } from "@/components/UI/badge";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Study } from "@/lib/types";
 
 interface StudyCardProps {

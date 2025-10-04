@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next";
-import { Label } from "@/components/UI/label";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/UI/select";
+} from "@/components/ui/select";
 import { useUiStore } from "@/store/useUiStore";
 
 // Mock missions - in real app, fetch from API

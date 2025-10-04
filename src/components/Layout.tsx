@@ -1,7 +1,7 @@
 import { Moon, Sun } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/UI/button";
+import { Button } from "@/components/ui/button";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useUiStore } from "@/store/useUiStore";
 import { cn } from "@/lib/utils";

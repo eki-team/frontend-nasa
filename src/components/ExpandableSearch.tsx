@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { Search, Sparkles, SlidersHorizontal, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Input } from "@/components/UI/input";
-import { Button } from "@/components/UI/button";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { FilterPanel } from "@/components/Filters/FilterPanel";
 import { useUiStore } from "@/store/useUiStore";
 

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { StudyCard } from "./StudyCard";
 import { Study } from "@/lib/types";
-import { Skeleton } from "@/components/UI/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface StudiesGridProps {
   studies: Study[];

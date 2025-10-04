@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { Label } from "@/components/UI/label";
-import { Input } from "@/components/UI/input";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useUiStore } from "@/store/useUiStore";
 
 export const YearRange = () => {

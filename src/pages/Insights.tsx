@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
-import { Card } from "@/components/UI/card";
-import { ErrorState } from "@/components/UI/ErrorState";
+import { Card } from "@/components/ui/card";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { getInsights } from "@/lib/api";
 
 const COLORS = ["#3b82f6", "#8b5cf6", "#10b981", "#f59e0b", "#ef4444"];
