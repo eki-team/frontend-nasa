@@ -1,59 +1,13 @@
 # 📚 NASA RAG Service - Documentación de Endpoints
 
-**Versión:** 1.0.0  
-**Base URL Desarrollo:** `http://localhost:8000`  
-**Base URL Producción:** `https://nasa-rag-service.onrender.com`  
-**Frontend Producción:** `https://frontend-nasa-mu9o.vercel.app`  
-**Total de Endpoints:** 13
-
----
-
-## 🔧 Configuración del Proyecto
-
-### Variables de Entorno
-
-**Desarrollo Local (.env.local):**
-```bash
-VITE_API_BASE_URL=https://nasa-rag-service.onrender.com
-VITE_USE_MOCK_DATA=false
-```
-
-**Producción (.env.production):**
-```bash
-VITE_API_BASE_URL=https://nasa-rag-service.onrender.com
-```
-
-### Proxy Configuration (Vercel)
-
-En producción, Vercel actúa como proxy para evitar CORS:
-
-```json
-// vercel.json
-{
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://nasa-rag-service.onrender.com/api/:path*"
-    },
-    {
-      "source": "/diag/:path*",
-      "destination": "https://nasa-rag-service.onrender.com/diag/:path*"
-    }
-  ]
-}
-```
-
-**Esto significa:**
-- Desarrollo: `http://localhost:8000/api/chat`
-- Producción Frontend: `/api/chat` (proxeado por Vercel)
-- Producción Directa: `https://nasa-rag-service.onrender.com/api/chat`
+Versión: 1.0.0  
+Base URL: `http://localhost:8000`  
+Total de Endpoints: **13**
 
 ---
 
 ## 📖 Tabla de Contenidos
 
-- [Configuración del Proyecto](#-configuración-del-proyecto)
-- [Integración Frontend](#-integración-frontend)
 - [Endpoints Principales](#endpoints-principales)
   - [Root](#1-root)
   - [Health Check](#2-health-check)
@@ -71,109 +25,6 @@ En producción, Vercel actúa como proxy para evitar CORS:
   - [POST /diag/retrieval](#post-diagretrieval)
   - [POST /diag/retrieval_audit](#post-diagretrieval_audit)
   - [GET /diag/mongo/health](#get-diagmongohealth)
-- [Sistema de Mock Data](#-sistema-de-mock-data)
-- [Troubleshooting](#-troubleshooting)
-
----
-
-## 🎨 Integración Frontend
-
-### Arquitectura de Conexión
-
-```
-┌─────────────────┐
-│  Usuario/       │
-│  Navegador      │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────────────────────────────┐
-│  Frontend (React + Vite)                │
-│  - Desarrollo: localhost:8081           │
-│  - Producción: Vercel                   │
-│                                          │
-│  Componentes principales:               │
-│  ✓ Dashboard.tsx (Chat RAG)             │
-│  ✓ ChatResult.tsx (Resultados)          │
-│  ✓ ExpandableSearch.tsx (Búsqueda)      │
-│  ✓ StudyCard.tsx (Tarjetas)             │
-└──────────┬──────────────────────────────┘
-           │
-           │ API Calls (fetch)
-           │
-           ▼
-┌─────────────────────────────────────────┐
-│  API Layer (src/lib/)                   │
-│  ✓ api-rag.ts (Chat RAG)                │
-│  ✓ api.ts (REST endpoints)              │
-│  ✓ mock-data.ts (Testing)               │
-└──────────┬──────────────────────────────┘
-           │
-           │ VITE_API_BASE_URL
-           │
-           ▼
-┌─────────────────────────────────────────┐
-│  Backend RAG Service                    │
-│  https://nasa-rag-service.onrender.com  │
-│                                          │
-│  ✓ MongoDB Atlas                        │
-│  ✓ OpenAI Embeddings                    │
-│  ✓ RAG Pipeline                         │
-└─────────────────────────────────────────┘
-```
-
-### Cliente API (src/lib/api-rag.ts)
-
-```typescript
-// Configuración automática según entorno
-const API_BASE_URL = import.meta.env.PROD 
-  ? "" // Producción: usa proxy de Vercel
-  : (import.meta.env.VITE_API_BASE_URL || "http://localhost:8000");
-
-// Función principal de Chat RAG
-export const chatQuery = async (request: ChatRequest): Promise<ChatResponse> => {
-  const response = await fetch(`${API_BASE_URL}/api/chat`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(request),
-  });
-  return response.json();
-};
-```
-
-### Uso en Componentes
-
-```typescript
-// Dashboard.tsx - Hook personalizado
-const { sendQuery, currentResponse, isLoading } = useChatRag();
-
-// Enviar query al RAG
-const handleSearch = (query: string) => {
-  sendQuery(query);
-};
-
-// El componente ChatResult hace scroll automático
-<AnimatePresence mode="wait">
-  {currentResponse && <ChatResult response={currentResponse} />}
-</AnimatePresence>
-```
-
-### Mapeo de Datos
-
-El frontend convierte las citaciones del RAG en tarjetas de estudios:
-
-```typescript
-// api.ts - Conversión de Citations a Studies
-const studies = ragResponse.citations.map((citation) => ({
-  id: citation.source_id,
-  title: citation.title,
-  year: citation.year,
-  abstract: citation.snippet,
-  mission: citation.osdr_id,
-  doi: citation.doi,
-  // ... más campos
-}));
-```
 
 ---
 
@@ -1079,141 +930,29 @@ curl -X GET "http://localhost:8000/diag/mongo/health"
 
 ---
 
-## 🎭 Sistema de Mock Data
+## 🐛 Códigos de Error Comunes
 
-El proyecto incluye un sistema completo de datos mock para desarrollo y testing sin necesidad del backend.
-
-### Activación
-
-```bash
-# .env.local
-VITE_USE_MOCK_DATA=true
-```
-
-### Características
-
-- ✅ **10 estudios científicos** completos con metadata realista
-- ✅ **5 categorías de respuestas RAG** (microgravity, radiation, bone, immune, general)
-- ✅ **Filtros funcionales**: query, mission, species, outcome, year range
-- ✅ **Paginación completa**
-- ✅ **KPIs, Insights y Knowledge Graph** mock
-- ✅ **Latencia simulada** (150-600ms según endpoint)
-- ✅ **Logging detallado** para debugging
-
-### Documentación
-
-Ver archivos:
-- `MOCK_DATA_SYSTEM.md` - Documentación completa
-- `QUICK_START_MOCK.md` - Guía rápida
-- `src/lib/mock-data.ts` - Implementación
+| Código | Descripción |
+|--------|-------------|
+| 200 | Success |
+| 404 | Recurso no encontrado |
+| 422 | Error de validación (campos requeridos faltantes o formato incorrecto) |
+| 500 | Error interno del servidor |
 
 ---
 
-## 🐛 Troubleshooting
+## 📦 Colección de Postman
 
-### Error: CORS blocked
-
-**Problema:** `Access to fetch at '...' has been blocked by CORS policy`
-
-**Soluciones:**
-
-1. **Desarrollo Local:**
-   ```bash
-   # .env.local
-   VITE_API_BASE_URL=https://nasa-rag-service.onrender.com
-   ```
-
-2. **Producción:**
-   - Vercel actúa como proxy (ya configurado en `vercel.json`)
-   - No se necesita configuración adicional
-
-### Error: Connection refused
-
-**Problema:** `POST http://localhost:8000/api/chat net::ERR_CONNECTION_REFUSED`
-
-**Solución:**
-```bash
-# Cambiar a backend de Render en .env.local
-VITE_API_BASE_URL=https://nasa-rag-service.onrender.com
-
-# O activar mocks
-VITE_USE_MOCK_DATA=true
-```
-
-### Error: MongoDB connection failed
-
-**Problema:** Backend retorna error 500 con mensaje de MongoDB
-
-**Solución:** Ver `MONGODB_CONNECTION_FIX.md`
-
-1. Configurar `MONGODB_URI` en Render dashboard
-2. Verificar Network Access en MongoDB Atlas
-3. Redeploy del backend
-
-### Papers muestran "Unknown"
-
-**Problema:** Las tarjetas de estudios muestran campos como "Unknown"
-
-**Solución:**
-- Verificado en commit `6860d0c`
-- Los campos opcionales ahora son `undefined` cuando no existen
-- El componente `StudyCard.tsx` maneja correctamente valores opcionales
-
-### Favicon no se actualiza
-
-**Problema:** Sigue apareciendo el favicon antiguo
-
-**Solución:**
-```bash
-# Hard refresh en el navegador
-Ctrl + Shift + R  # Windows/Linux
-Cmd + Shift + R   # Mac
-```
+Ver archivo: `NASA_RAG.postman_collection.json` para importar todos los endpoints en Postman.
 
 ---
-
-## 🔄 Cambios Recientes
 
 **Última actualización:** 4 de octubre de 2025
 
-### Commit History (últimos cambios):
-
-1. **feat: agregado scroll automático al resultado del chat RAG** (`92bd948`)
-   - Scroll automático cuando aparece respuesta
-   - Mejora de UX en móviles
-
-2. **fix: actualizado favicon, titulo y mapeo de datos RAG** (`6860d0c`)
-   - Favicon: logo_nasa.png
-   - Título: "NISCS - NASA Intelligent Science Catalog Search"
-   - Removido "Unknown" hardcoded
-
-3. **feat: implementado sistema completo de mock data** (`6993431`)
-   - 10 estudios mock + KPIs + Insights + Graph
-   - Sistema de filtrado completo
-   - Documentación en MOCK_DATA_SYSTEM.md
-
-4. **fix: removido theme toggle, forzado dark mode** (sesión anterior)
-   - Solo dark mode (tema espacial)
-   - Hero redesign: NISCS en bold
-   - Logo oficial en navbar
-
----
-
-## 📚 Referencias Adicionales
-
-- **Backend RAG:** https://nasa-rag-service.onrender.com
-- **Frontend:** https://frontend-nasa-mu9o.vercel.app
-- **GitHub:** eki-team/frontend-nasa
-- **Colección Postman:** `NASA_RAG.postman_collection.json`
-
-### Documentos Relacionados
-
-- `MOCK_DATA_SYSTEM.md` - Sistema completo de mock data
-- `QUICK_START_MOCK.md` - Guía rápida de mocks
-- `MONGODB_CONNECTION_FIX.md` - Solución de problemas MongoDB
-- `CORS_SOLUTION.md` - Configuración de CORS con Vercel
-- `RESUMEN_INTEGRACION_RAG.md` - Resumen de integración RAG
-
----
-
-**Fin del documento**
+**Cambios recientes:**
+- ✨ Expandido schema de citaciones con campos de scoring y relevancia
+- ✨ Agregado filtro `tags` para búsquedas más específicas
+- ✨ Agregados campos de similitud (`similarity_score`, `section_boost`, `final_score`)
+- ✨ Agregado campo `relevance_reason` explicando por qué se seleccionó cada chunk
+- ✨ Agregados más campos de metadata en citaciones (document_id, text, venue, etc.)
+- ✨ Mejorado endpoint `/diag/mongo/health` con información detallada de MongoDB

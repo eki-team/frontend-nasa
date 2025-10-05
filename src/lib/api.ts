@@ -81,7 +81,7 @@ const convertRagResponseToSearchResponse = (
   };
 };
 
-// Search studies - NUEVA IMPLEMENTACIÓN CON RAG
+// Search studies - USA /api/chat para búsqueda semántica o /api/front/documents/search para filtrado
 export const searchStudies = async (filters: SearchFilters): Promise<SearchResponse> => {
   // Modo mock
   if (USE_MOCK_DATA) {
@@ -97,29 +97,83 @@ export const searchStudies = async (filters: SearchFilters): Promise<SearchRespo
     return mockResponse;
   }
 
-  // Modo normal con backend
+  // Modo normal con backend RAG
   try {
-    // Si no hay query, retornar vacío
-    if (!filters.query || filters.query.trim() === "") {
-      return {
-        studies: [],
-        total: 0,
-        page: filters.page || 1,
-        pageSize: filters.pageSize || 12,
-        totalPages: 0,
-        hasMore: false,
-      };
+    // Si hay query, usar RAG chat para búsqueda semántica
+    if (filters.query && filters.query.trim() !== "") {
+      console.log('[API] Using RAG chat endpoint for semantic search');
+      
+      const ragResponse = await searchWithFrontendFilters(
+        filters.query,
+        filters,
+        filters.pageSize || 12
+      );
+
+      // Convertir respuesta RAG al formato esperado por el frontend
+      return convertRagResponseToSearchResponse(ragResponse, filters);
     }
-
-    // Usar el nuevo cliente RAG
-    const ragResponse = await searchWithFrontendFilters(
-      filters.query,
-      filters,
-      filters.pageSize || 12
+    
+    // Si NO hay query, usar endpoint de documents/search con filtros
+    console.log('[API] Using /api/front/documents/search for filtered search');
+    
+    const page = filters.page || 1;
+    const pageSize = filters.pageSize || 12;
+    const skip = (page - 1) * pageSize;
+    
+    // Construir body de búsqueda según filtros disponibles
+    const searchBody: any = {};
+    
+    // El backend usa tags, no species/outcome
+    // TODO: mapear correctamente los filtros del frontend a los del backend
+    if (filters.species && filters.species.length > 0) {
+      searchBody.tags = filters.species;
+    }
+    
+    if (filters.mission) {
+      searchBody.search_text = filters.mission;
+    }
+    
+    const response = await fetch(
+      `${API_BASE_URL}/api/front/documents/search?skip=${skip}&limit=${pageSize}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(searchBody)
+      }
     );
-
-    // Convertir respuesta RAG al formato esperado por el frontend
-    return convertRagResponseToSearchResponse(ragResponse, filters);
+    
+    if (!response.ok) {
+      throw new Error(`Search failed: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    // Convertir documentos del RAG a estudios
+    const studies = data.documents.map((doc: any) => ({
+      id: doc.pk,
+      title: doc.title || doc.article_metadata?.title,
+      authors: doc.article_metadata?.authors || [],
+      year: doc.article_metadata?.year || null,
+      abstract: doc.article_metadata?.abstract || "",
+      mission: doc.article_metadata?.mission || undefined,
+      species: doc.article_metadata?.organism || undefined,
+      outcomes: [],
+      citations: 0,
+      doi: doc.article_metadata?.doi || null,
+      relevanceScore: 0.90,
+      keywords: doc.tags || [],
+      summary: doc.article_metadata?.abstract?.substring(0, 300) || "",
+    }));
+    
+    return {
+      studies,
+      total: data.total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(data.total / pageSize),
+      hasMore: skip + studies.length < data.total,
+    };
+    
   } catch (error) {
     console.error("Search error:", error);
     console.warn('[API] 💡 Tip: Set VITE_USE_MOCK_DATA=true in .env to use mock data while backend is unavailable');
@@ -127,7 +181,7 @@ export const searchStudies = async (filters: SearchFilters): Promise<SearchRespo
   }
 };
 
-// Get study detail
+// Get study detail - USANDO ENDPOINT REAL DEL RAG
 export const getStudyById = async (id: string): Promise<StudyDetail> => {
   // Modo mock
   if (USE_MOCK_DATA) {
@@ -142,21 +196,41 @@ export const getStudyById = async (id: string): Promise<StudyDetail> => {
     return mockStudy;
   }
 
-  // Modo normal con backend
-  const response = await fetch(`${API_BASE_URL}/studies/${id}`);
+  // Modo normal con backend RAG - usar endpoint correcto
+  const response = await fetch(`${API_BASE_URL}/api/front/documents/${id}`);
   
   if (!response.ok) {
     throw new Error(`Failed to fetch study: ${response.statusText}`);
   }
   
-  return response.json();
+  const data = await response.json();
+  
+  // Convertir formato del RAG a formato frontend
+  return {
+    id: data.metadata.pk,
+    title: data.metadata.title,
+    year: data.metadata.article_metadata?.year || null,
+    mission: data.metadata.article_metadata?.mission || undefined,
+    species: data.metadata.article_metadata?.organism || undefined,
+    outcomes: [],
+    summary: data.chunks?.[0]?.text?.substring(0, 300) || "",
+    keywords: data.metadata.tags || [],
+    authors: data.metadata.article_metadata?.authors || [],
+    doi: data.metadata.article_metadata?.doi || null,
+    abstract: data.chunks?.map((c: any) => c.text).join("\n\n") || "",
+    citations: 0,
+    relevanceScore: 0.95,
+    related: [], // TODO: implementar related studies
+    methods: data.metadata.article_metadata?.methods || undefined,
+  };
 };
 
-// Get knowledge graph
+// Get knowledge graph - ENDPOINT NO DISPONIBLE EN RAG BACKEND
+// TODO: El backend RAG no tiene endpoint de graph, usar mock data o implementar en backend
 export const getKnowledgeGraph = async (filters?: Partial<SearchFilters>): Promise<GraphResponse> => {
-  // Modo mock
-  if (USE_MOCK_DATA) {
-    console.log('[API] Using mock data for knowledge graph');
+  // Siempre usar mock data ya que el endpoint no existe en el backend
+  if (USE_MOCK_DATA || true) {
+    console.log('[API] Using mock data for knowledge graph (endpoint not available in RAG backend)');
     
     // Simular delay de red
     await delay(400 + Math.random() * 200);
@@ -167,7 +241,7 @@ export const getKnowledgeGraph = async (filters?: Partial<SearchFilters>): Promi
     return mockGraph;
   }
 
-  // Modo normal con backend
+  // Este código nunca se ejecutará hasta que el backend implemente el endpoint
   const queryString = buildQueryString(filters || {});
   const response = await fetch(`${API_BASE_URL}/graph?${queryString}`);
   
@@ -178,11 +252,12 @@ export const getKnowledgeGraph = async (filters?: Partial<SearchFilters>): Promi
   return response.json();
 };
 
-// Get insights/overview
+// Get insights/overview - ENDPOINT NO DISPONIBLE EN RAG BACKEND
+// TODO: El backend RAG no tiene endpoint de insights, usar mock data o implementar en backend
 export const getInsights = async (filters?: Partial<SearchFilters>): Promise<Insights> => {
-  // Modo mock
-  if (USE_MOCK_DATA) {
-    console.log('[API] Using mock data for insights');
+  // Siempre usar mock data ya que el endpoint no existe en el backend
+  if (USE_MOCK_DATA || true) {
+    console.log('[API] Using mock data for insights (endpoint not available in RAG backend)');
     
     // Simular delay de red
     await delay(350 + Math.random() * 150);
@@ -193,7 +268,7 @@ export const getInsights = async (filters?: Partial<SearchFilters>): Promise<Ins
     return mockInsights;
   }
 
-  // Modo normal con backend
+  // Este código nunca se ejecutará hasta que el backend implemente el endpoint
   const queryString = buildQueryString(filters || {});
   const response = await fetch(`${API_BASE_URL}/insights/overview?${queryString}`);
   
@@ -204,7 +279,7 @@ export const getInsights = async (filters?: Partial<SearchFilters>): Promise<Ins
   return response.json();
 };
 
-// Get KPI data
+// Get KPI data - USANDO ENDPOINT REAL DEL RAG
 export const getKpiData = async (): Promise<KpiData> => {
   // Modo mock
   if (USE_MOCK_DATA) {
@@ -219,14 +294,22 @@ export const getKpiData = async (): Promise<KpiData> => {
     return mockKpi;
   }
 
-  // Modo normal con backend
-  const response = await fetch(`${API_BASE_URL}/kpi`);
+  // Modo normal con backend RAG - usar endpoint correcto
+  const response = await fetch(`${API_BASE_URL}/api/front/stats`);
   
   if (!response.ok) {
     throw new Error(`Failed to fetch KPI data: ${response.statusText}`);
   }
   
-  return response.json();
+  const data = await response.json();
+  
+  // Convertir formato del RAG a formato frontend
+  return {
+    totalStudies: data.total_documents || 0,
+    yearsCovered: "2018-2024", // TODO: calcular desde los datos
+    totalMissions: data.categories_count || 0,
+    totalSpecies: data.tags_count || 0,
+  };
 };
 
 // Export utilities
