@@ -26,10 +26,14 @@ const Dashboard = () => {
   // Scroll automático cuando empieza a buscar (isChatLoading = true)
   useEffect(() => {
     if (isChatLoading && chatSectionRef.current) {
-      chatSectionRef.current.scrollIntoView({ 
-        behavior: "smooth", 
-        block: "start",
-        inline: "nearest" 
+      // Scroll con offset para ver el mensaje "Buscando..."
+      const element = chatSectionRef.current;
+      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = elementPosition - 100; // 100px de margen superior
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
       });
     }
   }, [isChatLoading]);

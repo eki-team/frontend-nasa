@@ -227,7 +227,7 @@ export const searchStudies = async (filters: SearchFilters): Promise<SearchRespo
   }
 };
 
-// Get study detail - USA CACHÉ de búsquedas anteriores
+// Get study detail - USA CACHÉ o LLAMA AL CHAT RAG PARA OBTENER ABSTRACT
 export const getStudyById = async (id: string): Promise<StudyDetail> => {
   console.log(`[API] Fetching study by ID: ${id}`);
   
@@ -259,17 +259,122 @@ export const getStudyById = async (id: string): Promise<StudyDetail> => {
     };
   }
 
-  // ✅ FALLBACK: Si no está en caché, el endpoint /api/front/documents/{pk} NO EXISTE
-  // Retornar error o mock data
-  console.warn(`[API] ⚠️ Study ${id} not found in cache and /api/front/documents/{pk} endpoint does not exist`);
-  console.warn('[API] 💡 Tip: Make sure to search for studies first, which will populate the cache');
-  
-  // Opción 1: Retornar mock data como fallback
-  console.log('[API] Using mock data as fallback');
-  return getMockStudyById(id);
-  
-  // Opción 2: Lanzar error (comentado por ahora)
-  // throw new Error(`Study ${id} not found. Please search for studies first to populate the cache.`);
+  // ✅ SEGUNDO: No existe PK único por paper, usar búsqueda para obtener info
+  // Buscar el paper por su título/pk usando el endpoint de búsqueda
+  try {
+    console.log(`[API] Searching for document with pk: ${id}`);
+    
+    const response = await fetch(`${API_BASE_URL}/api/front/documents/search?skip=0&limit=1`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        search_text: id.replace(/-/g, ' ') // Convertir pk a texto de búsqueda
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const searchData = await response.json();
+    console.log('[API] Search result:', searchData);
+
+    if (!searchData.documents || searchData.documents.length === 0) {
+      throw new Error(`Document not found with pk: ${id}`);
+    }
+
+    const doc = searchData.documents[0];
+    const title = doc.article_metadata?.title || doc.title || "Unknown Title";
+    
+    // ✅ TERCERO: Usar /api/chat para obtener el abstract completo
+    // Hacemos una query específica para obtener información del paper
+    console.log(`[API] Fetching abstract via chat for: ${title}`);
+    
+    const chatResponse = await fetch(`${API_BASE_URL}/api/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: `What is the abstract or summary of the paper titled "${title}"?`,
+        top_k: 3
+      }),
+    });
+
+    if (!chatResponse.ok) {
+      throw new Error(`Chat API error! status: ${chatResponse.status}`);
+    }
+
+    const chatData = await chatResponse.json();
+    console.log('[API] Chat response received:', chatData);
+
+    // Extraer abstract de las citaciones
+    let abstract = "";
+    if (chatData.citations && chatData.citations.length > 0) {
+      // Buscar la citación que mejor coincida con el título
+      const relevantCitation = chatData.citations.find((c: any) => 
+        c.metadata?.article_metadata?.title?.toLowerCase().includes(title.toLowerCase()) ||
+        c.snippet?.toLowerCase().includes("abstract")
+      ) || chatData.citations[0];
+      
+      abstract = relevantCitation.snippet || relevantCitation.text || "";
+      
+      // Si el snippet contiene "Abstract:", extraerlo
+      const abstractMatch = abstract.match(/Abstract:\s*([\s\S]*?)(?=\n\n|Introduction:|Methods:|$)/i);
+      if (abstractMatch) {
+        abstract = abstractMatch[1].trim();
+      }
+    }
+
+    // Si no se encontró abstract en citations, usar la respuesta del chat
+    if (!abstract && chatData.answer) {
+      abstract = chatData.answer;
+    }
+
+    // Construir StudyDetail desde los datos combinados
+    const studyDetail: StudyDetail = {
+      id: doc.pk,
+      title: title,
+      year: parseInt(doc.article_metadata?.scraped_at?.substring(0, 4)) || null,
+      mission: undefined,
+      species: undefined,
+      outcomes: doc.tags || [],
+      summary: abstract.substring(0, 300) + (abstract.length > 300 ? "..." : ""),
+      abstract: abstract || "Abstract not available for this paper.",
+      citations: 0,
+      keywords: doc.tags || [],
+      related: [],
+      methods: undefined,
+      relevanceScore: undefined,
+      authors: doc.article_metadata?.authors || [],
+      doi: doc.article_metadata?.doi || null,
+    };
+
+    console.log('[API] Study detail constructed:', studyDetail);
+    
+    // Guardar en caché para futuras consultas
+    cacheStudy({
+      id: studyDetail.id,
+      title: studyDetail.title,
+      year: studyDetail.year,
+      mission: studyDetail.mission,
+      species: studyDetail.species,
+      outcomes: studyDetail.outcomes,
+      summary: studyDetail.summary,
+      abstract: studyDetail.abstract,
+      relevanceScore: studyDetail.relevanceScore,
+    });
+
+    return studyDetail;
+  } catch (error) {
+    console.error(`[API] Error fetching study ${id}:`, error);
+    console.warn('[API] Falling back to mock data');
+    
+    // Fallback a mock data si falla la llamada
+    return getMockStudyById(id);
+  }
 };
 
 // Get knowledge graph - ENDPOINT NO DISPONIBLE EN RAG BACKEND
