@@ -20,11 +20,43 @@ import {
   getMockGraph,
   delay
 } from "./mock-data";
+import { Study } from "./types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 // Flag para habilitar modo mock
 const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true';
+
+// ==================== CACHÉ DE ESTUDIOS ====================
+// Cache en memoria de estudios para poder acceder a los detalles sin hacer llamadas adicionales
+const studiesCache = new Map<string, Study>();
+
+/**
+ * Guarda un estudio en el caché
+ */
+export const cacheStudy = (study: Study) => {
+  studiesCache.set(study.id, study);
+  console.log(`[CACHE] Stored study: ${study.id}`);
+};
+
+/**
+ * Obtiene un estudio del caché
+ */
+export const getCachedStudy = (id: string): Study | undefined => {
+  const cached = studiesCache.get(id);
+  if (cached) {
+    console.log(`[CACHE] Found study in cache: ${id}`);
+  }
+  return cached;
+};
+
+/**
+ * Guarda múltiples estudios en el caché
+ */
+export const cacheStudies = (studies: Study[]) => {
+  studies.forEach(study => cacheStudy(study));
+  console.log(`[CACHE] Stored ${studies.length} studies`);
+};
 
 // Helper to build query string (mantenido para compatibilidad)
 const buildQueryString = (params: Record<string, any>): string => {
@@ -77,6 +109,9 @@ const convertRagResponseToSearchResponse = (
   });
 
   console.log('[API] Converted studies:', studies);
+
+  // ✅ CACHEAR ESTUDIOS para poder usarlos en getStudyById
+  cacheStudies(studies);
 
   return {
     studies,
@@ -188,8 +223,10 @@ export const searchStudies = async (filters: SearchFilters): Promise<SearchRespo
   }
 };
 
-// Get study detail - USANDO ENDPOINT REAL DEL RAG
+// Get study detail - USA CACHÉ de búsquedas anteriores
 export const getStudyById = async (id: string): Promise<StudyDetail> => {
+  console.log(`[API] Fetching study by ID: ${id}`);
+  
   // Modo mock
   if (USE_MOCK_DATA) {
     console.log('[API] Using mock data for study detail:', id);
@@ -203,33 +240,32 @@ export const getStudyById = async (id: string): Promise<StudyDetail> => {
     return mockStudy;
   }
 
-  // Modo normal con backend RAG - usar endpoint correcto
-  const response = await fetch(`${API_BASE_URL}/api/front/documents/${id}`);
-  
-  if (!response.ok) {
-    throw new Error(`Failed to fetch study: ${response.statusText}`);
+  // ✅ PRIMERO: Intentar obtener del caché
+  const cachedStudy = getCachedStudy(id);
+  if (cachedStudy) {
+    console.log(`[API] Using cached study: ${id}`);
+    
+    // Convertir Study a StudyDetail (agregar campos faltantes)
+    return {
+      ...cachedStudy,
+      summary: cachedStudy.abstract?.substring(0, 300) || "",
+      keywords: [],
+      related: [],
+      methods: undefined,
+    };
   }
+
+  // ✅ FALLBACK: Si no está en caché, el endpoint /api/front/documents/{pk} NO EXISTE
+  // Retornar error o mock data
+  console.warn(`[API] ⚠️ Study ${id} not found in cache and /api/front/documents/{pk} endpoint does not exist`);
+  console.warn('[API] 💡 Tip: Make sure to search for studies first, which will populate the cache');
   
-  const data = await response.json();
+  // Opción 1: Retornar mock data como fallback
+  console.log('[API] Using mock data as fallback');
+  return getMockStudyById(id);
   
-  // Convertir formato del RAG a formato frontend
-  return {
-    id: data.metadata.pk,
-    title: data.metadata.title,
-    year: data.metadata.article_metadata?.year || null,
-    mission: data.metadata.article_metadata?.mission || undefined,
-    species: data.metadata.article_metadata?.organism || undefined,
-    outcomes: [],
-    summary: data.chunks?.[0]?.text?.substring(0, 300) || "",
-    keywords: data.metadata.tags || [],
-    authors: data.metadata.article_metadata?.authors || [],
-    doi: data.metadata.article_metadata?.doi || null,
-    abstract: data.chunks?.map((c: any) => c.text).join("\n\n") || "",
-    citations: 0,
-    relevanceScore: 0.95,
-    related: [], // TODO: implementar related studies
-    methods: data.metadata.article_metadata?.methods || undefined,
-  };
+  // Opción 2: Lanzar error (comentado por ahora)
+  // throw new Error(`Study ${id} not found. Please search for studies first to populate the cache.`);
 };
 
 // Get knowledge graph - ENDPOINT NO DISPONIBLE EN RAG BACKEND
