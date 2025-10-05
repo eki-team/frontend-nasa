@@ -2,7 +2,7 @@
 
 Versión: 1.0.0  
 Base URL: `http://localhost:8000`  
-Total de Endpoints: **13**
+Total de Endpoints: **17**
 
 ---
 
@@ -15,8 +15,12 @@ Total de Endpoints: **13**
   - [POST /api/chat](#post-apichat)
 - [Frontend API](#frontend-api)
   - [GET /api/front/documents](#get-apifrontdocuments)
+  - [GET /api/front/documents/paginated](#get-apifrontdocumentspaginated)
+  - [GET /api/front/documents/by-category](#get-apifrontdocumentsby-category)
+  - [GET /api/front/documents/by-tags](#get-apifrontdocumentsby-tags)
   - [POST /api/front/documents/search](#post-apifrontdocumentssearch)
   - [GET /api/front/documents/{pk}](#get-apifrontdocumentspk)
+  - [GET /api/front/filter-values](#get-apifrontfilter-values)
   - [GET /api/front/filters](#get-apifrontfilters)
   - [GET /api/front/stats](#get-apifrontstats)
 - [Diagnostic API](#diagnostic-api)
@@ -25,6 +29,18 @@ Total de Endpoints: **13**
   - [POST /diag/retrieval](#post-diagretrieval)
   - [POST /diag/retrieval_audit](#post-diagretrieval_audit)
   - [GET /diag/mongo/health](#get-diagmongohealth)
+
+---
+
+## 📊 Resumen de Endpoints
+
+| Categoría | Número | Descripción |
+|-----------|--------|-------------|
+| **Principales** | 2 | Root y health check básico |
+| **Chat API** | 1 | RAG con búsqueda semántica |
+| **Frontend API** | 9 | Gestión de documentos, búsqueda y filtrado |
+| **Diagnostic API** | 5 | Health checks, embeddings, retrieval y auditoría |
+| **TOTAL** | **17** | Endpoints disponibles |
 
 ---
 
@@ -327,9 +343,170 @@ GET http://localhost:8000/api/front/documents?skip=0&limit=20
         }
       }
     }
+  ],
+  "page": null,
+  "page_size": null,
+  "total_pages": null
+}
+```
+
+> **Nota:** Los campos `page`, `page_size` y `total_pages` son opcionales y solo están disponibles cuando se usa paginación específica.
+
+---
+
+### GET /api/front/documents/paginated
+
+**Endpoint:** `GET /api/front/documents/paginated`
+
+**Descripción:** Paginación mejorada de documentos con filtros opcionales. A diferencia del endpoint `/documents`, este incluye información de paginación (página actual, páginas totales).
+
+**Query Parameters:**
+
+| Parámetro | Tipo | Default | Descripción |
+|-----------|------|---------|-------------|
+| `page` | integer | 1 | Número de página (empezando en 1) |
+| `page_size` | integer | 20 | Documentos por página (1-100) |
+| `category` | string | null | Filtrar por categoría específica |
+| `source_type` | string | null | Filtrar por tipo de fuente |
+
+**Request:**
+```bash
+GET http://localhost:8000/api/front/documents/paginated?page=1&page_size=20&category=space
+```
+
+**Response:**
+```json
+{
+  "total": 150,
+  "documents": [
+    {
+      "pk": "mice-in-bion-m-1-space-mission",
+      "title": "Mice in Bion-M 1 Space Mission: Training and Selection",
+      "source_type": "article",
+      "source_url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1234567/",
+      "category": "space",
+      "tags": ["mice", "space", "mission", "microgravity"],
+      "total_chunks": 55,
+      "article_metadata": {
+        "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1234567/",
+        "title": "Mice in Bion-M 1 Space Mission: Training and Selection",
+        "authors": ["John Doe", "Jane Smith"],
+        "scraped_at": "2024-01-15T10:30:00",
+        "pmc_id": "PMC1234567",
+        "doi": "10.1371/journal.pone.1234567",
+        "statistics": {
+          "word_count": 5420,
+          "sections": 8
+        }
+      }
+    }
+  ],
+  "page": 1,
+  "page_size": 20,
+  "total_pages": 8
+}
+```
+
+---
+
+### GET /api/front/documents/by-category
+
+**Endpoint:** `GET /api/front/documents/by-category`
+
+**Descripción:** Búsqueda de documentos filtrados por una categoría específica.
+
+**Query Parameters:**
+
+| Parámetro | Tipo | Requerido | Default | Descripción |
+|-----------|------|-----------|---------|-------------|
+| `category` | string | ✅ Sí | - | Categoría a filtrar |
+| `skip` | integer | ❌ No | 0 | Número de documentos a saltar |
+| `limit` | integer | ❌ No | 20 | Número de documentos por página (1-100) |
+
+**Request:**
+```bash
+GET http://localhost:8000/api/front/documents/by-category?category=space&skip=0&limit=20
+```
+
+**Response:**
+```json
+{
+  "total": 45,
+  "documents": [
+    {
+      "pk": "mice-in-bion-m-1-space-mission",
+      "title": "Mice in Bion-M 1 Space Mission",
+      "source_type": "article",
+      "category": "space",
+      "tags": ["mice", "space", "mission"],
+      "total_chunks": 55,
+      "article_metadata": {
+        "title": "Mice in Bion-M 1 Space Mission",
+        "authors": ["John Doe", "Jane Smith"],
+        "pmc_id": "PMC1234567"
+      }
+    }
   ]
 }
 ```
+
+**Códigos de Estado:**
+- `200 OK`: Documentos encontrados
+- `422 Unprocessable Entity`: Categoría no proporcionada
+- `500 Internal Server Error`: Error interno
+
+---
+
+### GET /api/front/documents/by-tags
+
+**Endpoint:** `GET /api/front/documents/by-tags`
+
+**Descripción:** Búsqueda de documentos filtrados por tags. Permite buscar documentos que coincidan con cualquiera de los tags (`match_all=false`) o con todos los tags (`match_all=true`).
+
+**Query Parameters:**
+
+| Parámetro | Tipo | Requerido | Default | Descripción |
+|-----------|------|-----------|---------|-------------|
+| `tags` | array[string] | ✅ Sí | - | Lista de tags a filtrar |
+| `match_all` | boolean | ❌ No | false | Si true, debe coincidir con todos los tags |
+| `skip` | integer | ❌ No | 0 | Número de documentos a saltar |
+| `limit` | integer | ❌ No | 20 | Número de documentos por página (1-100) |
+
+**Request (match any tag):**
+```bash
+GET http://localhost:8000/api/front/documents/by-tags?tags=mice&tags=mission&match_all=false
+```
+
+**Request (match all tags):**
+```bash
+GET http://localhost:8000/api/front/documents/by-tags?tags=mice&tags=space&tags=microgravity&match_all=true
+```
+
+**Response:**
+```json
+{
+  "total": 23,
+  "documents": [
+    {
+      "pk": "mice-in-bion-m-1-space-mission",
+      "title": "Mice in Bion-M 1 Space Mission",
+      "source_type": "article",
+      "category": "space",
+      "tags": ["mice", "space", "mission", "microgravity"],
+      "total_chunks": 55,
+      "article_metadata": {
+        "title": "Mice in Bion-M 1 Space Mission",
+        "authors": ["John Doe", "Jane Smith"]
+      }
+    }
+  ]
+}
+```
+
+**Códigos de Estado:**
+- `200 OK`: Documentos encontrados
+- `422 Unprocessable Entity`: Tags no proporcionados
+- `500 Internal Server Error`: Error interno
 
 ---
 
@@ -512,6 +689,47 @@ GET http://localhost:8000/api/front/documents/mice-in-bion-m-1-space-mission
 - `200 OK`: Documento encontrado
 - `404 Not Found`: Documento no existe
 - `500 Internal Server Error`: Error interno
+
+---
+
+### GET /api/front/filter-values
+
+**Endpoint:** `GET /api/front/filter-values`
+
+**Descripción:** Obtener valores disponibles para filtros dinámicos. Similar a `/filters` pero con valores predeterminados cuando no hay datos.
+
+**Request:**
+```bash
+GET http://localhost:8000/api/front/filter-values
+```
+
+**Response:**
+```json
+{
+  "categories": [
+    "general",
+    "mission",
+    "nasa",
+    "physics",
+    "planets",
+    "science",
+    "space",
+    "technology"
+  ],
+  "tags": [
+    "mice",
+    "mission",
+    "microgravity",
+    "spaceflight",
+    "immune",
+    "bone",
+    "muscle"
+  ],
+  "source_types": ["article"],
+  "total_documents": 536,
+  "total_chunks": 22674
+}
+```
 
 ---
 
@@ -918,6 +1136,21 @@ curl -X POST "http://localhost:8000/api/front/documents/search?skip=0&limit=10" 
   }'
 ```
 
+**Listar documentos paginados:**
+```bash
+curl -X GET "http://localhost:8000/api/front/documents/paginated?page=1&page_size=20&category=space"
+```
+
+**Buscar por categoría:**
+```bash
+curl -X GET "http://localhost:8000/api/front/documents/by-category?category=space&limit=10"
+```
+
+**Buscar por tags:**
+```bash
+curl -X GET "http://localhost:8000/api/front/documents/by-tags?tags=mice&tags=space&match_all=true"
+```
+
 **Health check:**
 ```bash
 curl -X GET "http://localhost:8000/diag/health"
@@ -947,9 +1180,21 @@ Ver archivo: `NASA_RAG.postman_collection.json` para importar todos los endpoint
 
 ---
 
-**Última actualización:** 4 de octubre de 2025
+**Última actualización:** 5 de octubre de 2025
 
-**Cambios recientes:**
+**Cambios recientes (v1.0.0):**
+
+### 5 de octubre de 2025
+- 🆕 **4 nuevos endpoints en Frontend API:**
+  - `GET /api/front/documents/paginated` - Paginación mejorada con info de páginas
+  - `GET /api/front/documents/by-category` - Filtrado directo por categoría
+  - `GET /api/front/documents/by-tags` - Filtrado por tags (con match_all opcional)
+  - `GET /api/front/filter-values` - Valores de filtros con defaults
+- ✨ Agregados campos de paginación opcionales en `DocumentListResponse`
+  - `page`, `page_size`, `total_pages`
+- 📝 Mejorada documentación con ejemplos de cURL para nuevos endpoints
+
+### 4 de octubre de 2025
 - ✨ Expandido schema de citaciones con campos de scoring y relevancia
 - ✨ Agregado filtro `tags` para búsquedas más específicas
 - ✨ Agregados campos de similitud (`similarity_score`, `section_boost`, `final_score`)

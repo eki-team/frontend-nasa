@@ -2,12 +2,27 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, BookOpen, ChevronLeft, ChevronRight, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { listDocuments, searchDocuments, type Document } from "@/lib/api";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
+  listDocumentsPaginated, 
+  searchDocuments, 
+  getFilterValues,
+  searchDocumentsByCategory,
+  searchDocumentsByTags,
+  type Document,
+  type FilterValues 
+} from "@/lib/api";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 
@@ -19,9 +34,25 @@ export const Explore = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filterValues, setFilterValues] = useState<FilterValues | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedTag, setSelectedTag] = useState<string>("");
 
   const pageSize = 20;
   const totalPages = Math.ceil(total / pageSize);
+
+  // Cargar valores de filtros al inicio
+  useEffect(() => {
+    const loadFilterValues = async () => {
+      try {
+        const values = await getFilterValues();
+        setFilterValues(values);
+      } catch (err) {
+        console.error("Error loading filter values:", err);
+      }
+    };
+    loadFilterValues();
+  }, []);
 
   // Fetch documents
   useEffect(() => {
@@ -30,13 +61,26 @@ export const Explore = () => {
       setError(null);
 
       try {
-        const skip = (currentPage - 1) * pageSize;
-
         let response;
+        
+        // Si hay búsqueda por texto, usar search
         if (searchQuery.trim()) {
+          const skip = (currentPage - 1) * pageSize;
           response = await searchDocuments(searchQuery, skip, pageSize);
-        } else {
-          response = await listDocuments(skip, pageSize);
+        } 
+        // Si hay filtro por tag
+        else if (selectedTag) {
+          const skip = (currentPage - 1) * pageSize;
+          response = await searchDocumentsByTags([selectedTag], false, skip, pageSize);
+        }
+        // Si hay filtro por categoría
+        else if (selectedCategory) {
+          const skip = (currentPage - 1) * pageSize;
+          response = await searchDocumentsByCategory(selectedCategory, skip, pageSize);
+        }
+        // Sin filtros, usar paginación mejorada
+        else {
+          response = await listDocumentsPaginated(currentPage, pageSize);
         }
 
         setDocuments(response.documents);
@@ -50,12 +94,33 @@ export const Explore = () => {
     };
 
     fetchDocuments();
-  }, [currentPage, searchQuery]);
+  }, [currentPage, searchQuery, selectedCategory, selectedTag]);
 
   // Handle search
   const handleSearch = (value: string) => {
     setSearchQuery(value);
     setCurrentPage(1); // Reset to first page on new search
+    // Clear filters when searching
+    setSelectedCategory("");
+    setSelectedTag("");
+  };
+
+  // Handle category filter
+  const handleCategoryChange = (value: string) => {
+    setSelectedCategory(value === "all" ? "" : value);
+    setCurrentPage(1);
+    // Clear search and tag when filtering by category
+    setSearchQuery("");
+    setSelectedTag("");
+  };
+
+  // Handle tag filter
+  const handleTagChange = (value: string) => {
+    setSelectedTag(value === "all" ? "" : value);
+    setCurrentPage(1);
+    // Clear search and category when filtering by tag
+    setSearchQuery("");
+    setSelectedCategory("");
   };
 
   // Handle pagination
@@ -95,6 +160,68 @@ export const Explore = () => {
           </div>
         </div>
 
+        {/* Filters */}
+        {filterValues && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex items-center justify-center gap-4 flex-wrap"
+          >
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Filters:</span>
+            </div>
+
+            {/* Category Filter */}
+            <Select value={selectedCategory || "all"} onValueChange={handleCategoryChange}>
+              <SelectTrigger className="w-[180px] glass-input">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {filterValues.categories.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Tag Filter */}
+            <Select value={selectedTag || "all"} onValueChange={handleTagChange}>
+              <SelectTrigger className="w-[180px] glass-input">
+                <SelectValue placeholder="Tag" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Tags</SelectItem>
+                {filterValues.tags.slice(0, 20).map((tag) => (
+                  <SelectItem key={tag} value={tag}>
+                    {tag}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Clear Filters */}
+            {(selectedCategory || selectedTag || searchQuery) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("");
+                  setSelectedTag("");
+                  setCurrentPage(1);
+                }}
+                className="text-xs"
+              >
+                Clear Filters
+              </Button>
+            )}
+          </motion.div>
+        )}
+
         {/* Stats */}
         <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
@@ -115,7 +242,6 @@ export const Explore = () => {
       {/* Error State */}
       {error && (
         <ErrorState
-          title={t("common.error")}
           message={error}
           onRetry={() => setCurrentPage(1)}
         />
@@ -137,8 +263,14 @@ export const Explore = () => {
       {/* Empty State */}
       {!isLoading && !error && documents.length === 0 && (
         <EmptyState
-          title={t("explore.noDocuments")}
-          message={t("explore.tryAdjusting")}
+          message={searchQuery 
+            ? t("explore.tryAdjusting") 
+            : selectedCategory 
+            ? `No documents found in category: ${selectedCategory}` 
+            : selectedTag
+            ? `No documents found with tag: ${selectedTag}`
+            : t("explore.tryAdjusting")
+          }
         />
       )}
 

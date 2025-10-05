@@ -492,6 +492,209 @@ export const searchDocuments = async (
   return data;
 };
 
+/**
+ * Lista documentos con paginación mejorada (incluye info de páginas)
+ */
+export interface PaginatedDocumentsResponse extends DocumentsResponse {
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
+export const listDocumentsPaginated = async (
+  page: number = 1,
+  pageSize: number = 20,
+  category?: string,
+  sourceType?: string
+): Promise<PaginatedDocumentsResponse> => {
+  console.log(`[API] Listing paginated documents: page=${page}, pageSize=${pageSize}, category=${category}`);
+
+  if (USE_MOCK_DATA) {
+    console.log('[API] Using mock data for paginated documents');
+    await delay(300);
+    
+    const mockStudies = getMockStudies({ page, pageSize });
+    const totalPages = Math.ceil(mockStudies.total / pageSize);
+    
+    return {
+      total: mockStudies.total,
+      documents: mockStudies.studies.map(study => ({
+        pk: study.id,
+        title: study.title,
+        source_type: "article",
+        category: "space",
+        tags: study.keywords || [],
+        total_chunks: 10,
+        article_metadata: {
+          title: study.title,
+          authors: study.authors,
+          doi: study.doi || undefined,
+        }
+      })),
+      page,
+      page_size: pageSize,
+      total_pages: totalPages
+    };
+  }
+
+  let url = `${API_BASE_URL}/api/front/documents/paginated?page=${page}&page_size=${pageSize}`;
+  if (category) url += `&category=${category}`;
+  if (sourceType) url += `&source_type=${sourceType}`;
+  
+  console.log('[API] Request URL:', url);
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch paginated documents: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  console.log('[API] Paginated documents response:', data);
+
+  return data;
+};
+
+/**
+ * Busca documentos por categoría
+ */
+export const searchDocumentsByCategory = async (
+  category: string,
+  skip: number = 0,
+  limit: number = 20
+): Promise<DocumentsResponse> => {
+  console.log(`[API] Searching documents by category: "${category}", skip=${skip}, limit=${limit}`);
+
+  if (USE_MOCK_DATA) {
+    console.log('[API] Using mock data for documents by category');
+    await delay(300);
+    
+    const mockStudies = getMockStudies({ page: Math.floor(skip / limit) + 1, pageSize: limit });
+    return {
+      total: mockStudies.total,
+      documents: mockStudies.studies.map(study => ({
+        pk: study.id,
+        title: study.title,
+        source_type: "article",
+        category: category,
+        tags: study.keywords || [],
+        total_chunks: 10,
+        article_metadata: {
+          title: study.title,
+          authors: study.authors,
+          doi: study.doi || undefined,
+        }
+      }))
+    };
+  }
+
+  const url = `${API_BASE_URL}/api/front/documents/by-category?category=${encodeURIComponent(category)}&skip=${skip}&limit=${limit}`;
+  console.log('[API] Request URL:', url);
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Failed to search documents by category: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  console.log('[API] Documents by category response:', data);
+
+  return data;
+};
+
+/**
+ * Busca documentos por tags
+ */
+export const searchDocumentsByTags = async (
+  tags: string[],
+  matchAll: boolean = false,
+  skip: number = 0,
+  limit: number = 20
+): Promise<DocumentsResponse> => {
+  console.log(`[API] Searching documents by tags: [${tags.join(", ")}], matchAll=${matchAll}, skip=${skip}, limit=${limit}`);
+
+  if (USE_MOCK_DATA) {
+    console.log('[API] Using mock data for documents by tags');
+    await delay(300);
+    
+    const mockStudies = getMockStudies({ page: Math.floor(skip / limit) + 1, pageSize: limit });
+    return {
+      total: mockStudies.total,
+      documents: mockStudies.studies.map(study => ({
+        pk: study.id,
+        title: study.title,
+        source_type: "article",
+        category: "space",
+        tags: tags.slice(0, 3),
+        total_chunks: 10,
+        article_metadata: {
+          title: study.title,
+          authors: study.authors,
+          doi: study.doi || undefined,
+        }
+      }))
+    };
+  }
+
+  const tagsParam = tags.map(tag => `tags=${encodeURIComponent(tag)}`).join('&');
+  const url = `${API_BASE_URL}/api/front/documents/by-tags?${tagsParam}&match_all=${matchAll}&skip=${skip}&limit=${limit}`;
+  console.log('[API] Request URL:', url);
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Failed to search documents by tags: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  console.log('[API] Documents by tags response:', data);
+
+  return data;
+};
+
+/**
+ * Obtiene valores disponibles para filtros
+ */
+export interface FilterValues {
+  categories: string[];
+  tags: string[];
+  source_types: string[];
+  total_documents: number;
+  total_chunks: number;
+}
+
+export const getFilterValues = async (): Promise<FilterValues> => {
+  console.log('[API] Getting filter values');
+
+  if (USE_MOCK_DATA) {
+    console.log('[API] Using mock data for filter values');
+    await delay(200);
+    
+    return {
+      categories: ["space", "biology", "physics", "general"],
+      tags: ["mice", "mission", "microgravity", "spaceflight", "immune", "bone"],
+      source_types: ["article"],
+      total_documents: 150,
+      total_chunks: 3500
+    };
+  }
+
+  const url = `${API_BASE_URL}/api/front/filter-values`;
+  console.log('[API] Request URL:', url);
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch filter values: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  console.log('[API] Filter values response:', data);
+
+  return data;
+};
+
 // Export utilities
 export const exportToCSV = (data: any[], filename: string = "export.csv") => {
   if (!data.length) return;
