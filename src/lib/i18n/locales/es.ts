@@ -13,7 +13,9 @@ export const es = {
     copyLink: "Copiar Enlace"
   },
   nav: {
+    home: "Inicio",
     dashboard: "Panel",
+    explore: "Explorar",
     graph: "Grafo de Conocimiento",
     insights: "Análisis y Tendencias"
   },
@@ -54,6 +56,18 @@ export const es = {
     species: "Especies",
     outcomes: "Resultados",
     backToDashboard: "Volver al Panel"
+  },
+  explore: {
+    title: "Explorar Publicaciones",
+    subtitle: "Navega por todos los artículos científicos disponibles",
+    searchPlaceholder: "Buscar por título, autores o contenido...",
+    totalDocuments: "Total de Documentos",
+    showing: "Mostrando",
+    of: "de",
+    previous: "Anterior",
+    next: "Siguiente",
+    noDocuments: "No se encontraron documentos",
+    tryAdjusting: "Intenta ajustar tu búsqueda"
   },
   graph: {
     title: "Grafo de Conocimiento",

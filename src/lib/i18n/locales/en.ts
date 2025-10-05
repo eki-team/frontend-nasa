@@ -13,7 +13,9 @@ export const en = {
     copyLink: "Copy Link"
   },
   nav: {
+    home: "Home",
     dashboard: "Dashboard",
+    explore: "Explore",
     graph: "Knowledge Graph",
     insights: "Insights & Trends"
   },
@@ -54,6 +56,18 @@ export const en = {
     species: "Species",
     outcomes: "Outcomes",
     backToDashboard: "Back to Dashboard"
+  },
+  explore: {
+    title: "Explore Publications",
+    subtitle: "Browse all available scientific papers",
+    searchPlaceholder: "Search by title, authors, or content...",
+    totalDocuments: "Total Documents",
+    showing: "Showing",
+    of: "of",
+    previous: "Previous",
+    next: "Next",
+    noDocuments: "No documents found",
+    tryAdjusting: "Try adjusting your search query"
   },
   graph: {
     title: "Knowledge Graph",

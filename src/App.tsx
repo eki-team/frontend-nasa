@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { useUiStore } from "@/store/useUiStore";
 import Dashboard from "./pages/Dashboard";
+import { Explore } from "./pages/Explore";
 import StudyDetail from "./pages/StudyDetail";
 import GraphViewer from "./pages/GraphViewer";
 import Insights from "./pages/Insights";
@@ -33,6 +34,7 @@ const AppContent = () => {
     <Layout>
       <Routes>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/explore" element={<Explore />} />
         <Route path="/study/:id" element={<StudyDetail />} />
         <Route path="/graph" element={<GraphViewer />} />
         <Route path="/insights" element={<Insights />} />

@@ -61,7 +61,7 @@ export const StudiesGrid = ({ studies, isLoading }: StudiesGridProps) => {
             damping: 15
           }}
         >
-          <StudyCard study={study} />
+          <StudyCard study={study} isTopResult={index === 0} />
         </motion.div>
       ))}
     </motion.div>

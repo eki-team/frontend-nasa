@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { Home, Search, BarChart3, Network } from "lucide-react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -26,6 +27,11 @@ export const Layout = ({ children }: LayoutProps) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Helper to check if route is active
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
     <div className="min-h-screen relative">
       {/* Earth Background with Parallax */}
@@ -42,6 +48,36 @@ export const Layout = ({ children }: LayoutProps) => {
                   className="h-12 w-auto object-contain"
                 />
               </Link>
+
+              {/* Navigation */}
+              <nav className="hidden md:flex items-center gap-1">
+                <Link
+                  to="/"
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                    isActive("/")
+                      ? "bg-primary/20 text-primary font-semibold"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/10"
+                  }`}
+                >
+                  <Home className="h-4 w-4" />
+                  {t("nav.home")}
+                </Link>
+
+                <Link
+                  to="/explore"
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                    isActive("/explore")
+                      ? "bg-primary/20 text-primary font-semibold"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/10"
+                  }`}
+                >
+                  <Search className="h-4 w-4" />
+                  {t("nav.explore")}
+                </Link>
+
+                
+               
+              </nav>
             </div>
 
             <div className="flex items-center gap-2">

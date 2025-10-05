@@ -1,4 +1,4 @@
-import { Calendar, FileText, Tag } from "lucide-react";
+import { Calendar, FileText, Tag, Rocket } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { Study } from "@/lib/types";
 
 interface StudyCardProps {
   study: Study;
+  isTopResult?: boolean; // Nuevo prop para indicar si es el resultado más relevante
 }
 
 const getOutcomeColor = (outcome: string) => {
@@ -22,7 +23,7 @@ const getOutcomeColor = (outcome: string) => {
   }
 };
 
-export const StudyCard = ({ study }: StudyCardProps) => {
+export const StudyCard = ({ study, isTopResult = false }: StudyCardProps) => {
   return (
     <Link to={`/study/${study.id}`}>
       <motion.div
@@ -30,7 +31,9 @@ export const StudyCard = ({ study }: StudyCardProps) => {
         whileTap={{ scale: 0.98 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
       >
-        <Card className="p-6 h-full glass-card-light hover:bg-accent/10 hover:shadow-2xl transition-all group cursor-pointer relative overflow-hidden border-border/50">
+        <Card className={`p-6 h-full glass-card-light hover:bg-accent/10 hover:shadow-2xl transition-all group cursor-pointer relative overflow-hidden ${
+          isTopResult ? 'border-2 border-accent/70 shadow-lg shadow-accent/20' : 'border-border/50'
+        }`}>
           {/* Animated background on hover */}
           <motion.div
             className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -105,6 +108,21 @@ export const StudyCard = ({ study }: StudyCardProps) => {
               </div>
             )}
           </div>
+          
+          {/* Badge de "Top Result" con cohete - Abajo a la derecha */}
+          {isTopResult && (
+            <motion.div
+              initial={{ scale: 0, rotate: -45 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.2 }}
+              className="absolute bottom-3 right-3 z-20"
+            >
+              <Badge className="bg-gradient-to-r from-accent to-yellow-500 text-white border-0 shadow-lg flex items-center gap-1 px-2 py-1">
+                <Rocket className="h-3 w-3" />
+                <span className="text-xs font-bold">Top Match</span>
+              </Badge>
+            </motion.div>
+          )}
         </Card>
       </motion.div>
     </Link>

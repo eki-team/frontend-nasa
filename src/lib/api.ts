@@ -108,7 +108,11 @@ const convertRagResponseToSearchResponse = (
     };
   });
 
-  console.log('[API] Converted studies:', studies);
+  // ✅ ORDENAR por relevanceScore (final_score) de mayor a menor
+  studies.sort((a, b) => b.relevanceScore - a.relevanceScore);
+  
+  console.log('[API] Converted studies (sorted by relevance):', studies);
+  console.log(`[API] Top result: ${studies[0]?.title} (score: ${studies[0]?.relevanceScore})`);
 
   // ✅ CACHEAR ESTUDIOS para poder usarlos en getStudyById
   cacheStudies(studies);
@@ -353,6 +357,139 @@ export const getKpiData = async (): Promise<KpiData> => {
     totalMissions: data.categories_count || 0,
     totalSpecies: data.tags_count || 0,
   };
+};
+
+// ==================== EXPLORAR DOCUMENTOS ====================
+
+export interface Document {
+  pk: string;
+  title: string;
+  source_type: string;
+  source_url?: string;
+  category: string;
+  tags: string[];
+  total_chunks: number;
+  article_metadata?: {
+    url?: string;
+    title?: string;
+    authors?: string[];
+    scraped_at?: string;
+    pmc_id?: string;
+    doi?: string;
+    statistics?: {
+      word_count?: number;
+      sections?: number;
+    };
+  };
+}
+
+export interface DocumentsResponse {
+  total: number;
+  documents: Document[];
+}
+
+/**
+ * Lista todos los documentos con paginación
+ */
+export const listDocuments = async (
+  skip: number = 0,
+  limit: number = 20
+): Promise<DocumentsResponse> => {
+  console.log(`[API] Listing documents: skip=${skip}, limit=${limit}`);
+
+  if (USE_MOCK_DATA) {
+    console.log('[API] Using mock data for documents list');
+    await delay(300);
+    
+    // Retornar mock data (reutilizar studies como documentos)
+    const mockStudies = getMockStudies({ page: Math.floor(skip / limit) + 1, pageSize: limit });
+    return {
+      total: mockStudies.total,
+      documents: mockStudies.studies.map(study => ({
+        pk: study.id,
+        title: study.title,
+        source_type: "article",
+        category: "space",
+        tags: study.keywords || [],
+        total_chunks: 10,
+        article_metadata: {
+          title: study.title,
+          authors: study.authors,
+          doi: study.doi || undefined,
+        }
+      }))
+    };
+  }
+
+  const url = `${API_BASE_URL}/api/front/documents?skip=${skip}&limit=${limit}`;
+  console.log('[API] Request URL:', url);
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch documents: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  console.log('[API] Documents response:', data);
+
+  return data;
+};
+
+/**
+ * Busca documentos por texto
+ */
+export const searchDocuments = async (
+  searchText: string,
+  skip: number = 0,
+  limit: number = 20
+): Promise<DocumentsResponse> => {
+  console.log(`[API] Searching documents: "${searchText}", skip=${skip}, limit=${limit}`);
+
+  if (USE_MOCK_DATA) {
+    console.log('[API] Using mock data for documents search');
+    await delay(300);
+    
+    const mockStudies = getMockStudies({ query: searchText, page: Math.floor(skip / limit) + 1, pageSize: limit });
+    return {
+      total: mockStudies.total,
+      documents: mockStudies.studies.map(study => ({
+        pk: study.id,
+        title: study.title,
+        source_type: "article",
+        category: "space",
+        tags: study.keywords || [],
+        total_chunks: 10,
+        article_metadata: {
+          title: study.title,
+          authors: study.authors,
+          doi: study.doi || undefined,
+        }
+      }))
+    };
+  }
+
+  const url = `${API_BASE_URL}/api/front/documents/search?skip=${skip}&limit=${limit}`;
+  console.log('[API] Request URL:', url);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      search_text: searchText,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to search documents: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  console.log('[API] Search response:', data);
+
+  return data;
 };
 
 // Export utilities
