@@ -149,9 +149,9 @@ All colors MUST be HSL.
   }
 
   .glass-card-light {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 30, 0.4);
     backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
   }
 

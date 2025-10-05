@@ -78,14 +78,14 @@ const Dashboard = () => {
           <motion.div
             animate={{
               scale: [1, 1.1, 1],
-              opacity: [0.2, 0.4, 0.2],
+              opacity: [0.1, 0.2, 0.1],
             }}
             transition={{
               duration: 8,
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-primary/20 via-accent/20 to-primary/20 rounded-full blur-3xl"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-primary/10 via-accent/10 to-primary/10 rounded-full blur-3xl"
           />
         </div>
 
