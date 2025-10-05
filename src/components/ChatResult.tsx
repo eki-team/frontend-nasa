@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChatResponse } from "@/lib/api-rag";
 import { useTranslation } from "react-i18next";
-import { useEffect, useRef } from "react";
 
 interface ChatResultProps {
   response: ChatResponse;
@@ -12,22 +11,9 @@ interface ChatResultProps {
 
 export const ChatResult = ({ response }: ChatResultProps) => {
   const { t } = useTranslation();
-  const resultRef = useRef<HTMLDivElement>(null);
-
-  // Scroll automático cuando aparece la respuesta
-  useEffect(() => {
-    if (resultRef.current) {
-      resultRef.current.scrollIntoView({ 
-        behavior: "smooth", 
-        block: "start",
-        inline: "nearest" 
-      });
-    }
-  }, [response]);
 
   return (
     <motion.div
-      ref={resultRef}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}

@@ -14,12 +14,25 @@ import { searchStudies, getKpiData, exportToCSV, exportToJSON } from "@/lib/api"
 import { useChatRag } from "@/hooks/useChatRag";
 import { useFilters } from "@/hooks/useFilters";
 import { useDeepLink } from "@/hooks/useDeepLink";
+import { useRef, useEffect } from "react";
 
 const Dashboard = () => {
   const { t } = useTranslation();
   const { filters } = useFilters();
   const { copyCurrentUrl } = useDeepLink();
   const { sendQuery, currentResponse, isLoading: isChatLoading } = useChatRag();
+  const chatSectionRef = useRef<HTMLDivElement>(null);
+
+  // Scroll automático cuando empieza a buscar (isChatLoading = true)
+  useEffect(() => {
+    if (isChatLoading && chatSectionRef.current) {
+      chatSectionRef.current.scrollIntoView({ 
+        behavior: "smooth", 
+        block: "start",
+        inline: "nearest" 
+      });
+    }
+  }, [isChatLoading]);
 
   const { data: searchData, isLoading: isLoadingSearch, error: searchError, refetch } = useQuery({
     queryKey: ["search", filters],
@@ -127,25 +140,27 @@ const Dashboard = () => {
       </motion.div>
 
       {/* Chat RAG Results */}
-      <AnimatePresence mode="wait">
-        {isChatLoading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="flex justify-center items-center py-12"
-          >
-            <div className="flex items-center gap-3 text-cyan-300">
-              <Sparkles className="h-6 w-6 animate-spin" />
-              <span className="text-lg">{t("chat.searching")}</span>
-            </div>
-          </motion.div>
-        )}
+      <div ref={chatSectionRef}>
+        <AnimatePresence mode="wait">
+          {isChatLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex justify-center items-center py-12"
+            >
+              <div className="flex items-center gap-3 text-cyan-300">
+                <Sparkles className="h-6 w-6 animate-spin" />
+                <span className="text-lg">{t("chat.searching")}</span>
+              </div>
+            </motion.div>
+          )}
 
-        {currentResponse && !isChatLoading && (
-          <ChatResult response={currentResponse} />
-        )}
-      </AnimatePresence>
+          {currentResponse && !isChatLoading && (
+            <ChatResult response={currentResponse} />
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* KPIs with stagger animation - Only show when there are results */}
       {(searchData || filters.query || filters.q) && (
