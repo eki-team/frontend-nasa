@@ -55,6 +55,7 @@ export const en = {
     mission: "Mission",
     species: "Species",
     outcomes: "Outcomes",
+    back: "Back",
     backToDashboard: "Back to Dashboard"
   },
   explore: {

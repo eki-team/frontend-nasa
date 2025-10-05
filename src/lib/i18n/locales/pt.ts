@@ -53,6 +53,7 @@ export const pt = {
     mission: "Missão",
     species: "Espécies",
     outcomes: "Resultados",
+    back: "Voltar",
     backToDashboard: "Voltar ao painel"
   },
   graph: {

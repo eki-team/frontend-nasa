@@ -53,6 +53,7 @@ export const de = {
     mission: "Mission",
     species: "Arten",
     outcomes: "Ergebnisse",
+    back: "Zurück",
     backToDashboard: "Zurück zum Dashboard"
   },
   graph: {

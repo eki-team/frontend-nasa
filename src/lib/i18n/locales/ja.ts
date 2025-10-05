@@ -53,6 +53,7 @@ export const ja = {
     mission: "ミッション",
     species: "種",
     outcomes: "結果",
+    back: "戻る",
     backToDashboard: "ダッシュボードに戻る"
   },
   graph: {

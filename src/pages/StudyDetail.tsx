@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, Calendar, Rocket, FlaskConical, Tag, FileText } from "lucide-react";
@@ -14,6 +14,7 @@ import { getStudyById } from "@/lib/api";
 const StudyDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const { data: study, isLoading, error } = useQuery({
     queryKey: ["study", id],
@@ -38,12 +39,14 @@ const StudyDetail = () => {
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       {/* Back Button */}
-      <Link to="/">
-        <Button variant="ghost" size="sm">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          {t("study.backToDashboard")}
-        </Button>
-      </Link>
+      <Button 
+        variant="ghost" 
+        size="sm"
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        {t("study.back")}
+      </Button>
 
       {/* Study Header */}
       <div className="space-y-4">
