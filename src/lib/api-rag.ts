@@ -5,6 +5,11 @@ const API_BASE_URL = import.meta.env.PROD
   ? "" // Empty string = same origin, uses Vercel proxy
   : (import.meta.env.VITE_API_BASE_URL || "http://localhost:8000");
 
+// Flag para habilitar modo mock (útil cuando el backend no está disponible)
+const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true';
+
+import { getMockChatResponse, delay } from './mock-data';
+
 // ==================== TIPOS ====================
 
 export interface ChatRequest {
@@ -79,6 +84,21 @@ export interface RetrievalResponse {
  * Realiza una consulta al sistema RAG con filtros opcionales
  */
 export const chatQuery = async (request: ChatRequest): Promise<ChatResponse> => {
+  // Modo mock: útil cuando el backend no está disponible
+  if (USE_MOCK_DATA) {
+    console.log('[API] Using mock data mode');
+    console.log('[API] Mock request:', JSON.stringify(request, null, 2));
+    
+    // Simular delay de red (200-400ms aleatorio)
+    await delay(200 + Math.random() * 200);
+    
+    const mockResponse = getMockChatResponse(request.query);
+    console.log('[API] Mock response:', mockResponse);
+    
+    return mockResponse;
+  }
+
+  // Modo normal: conectar al backend real
   try {
     const url = `${API_BASE_URL}/api/chat`;
     console.log('[API] Sending request to:', url);
@@ -98,6 +118,10 @@ export const chatQuery = async (request: ChatRequest): Promise<ChatResponse> => 
     if (!response.ok) {
       const errorText = await response.text();
       console.error('[API] Error response:', errorText);
+      
+      // Si el backend falla, sugerir usar modo mock
+      console.warn('[API] 💡 Tip: Set VITE_USE_MOCK_DATA=true in .env to use mock data while backend is unavailable');
+      
       throw new Error(`Chat query failed: ${response.status} ${response.statusText} - ${errorText}`);
     }
 

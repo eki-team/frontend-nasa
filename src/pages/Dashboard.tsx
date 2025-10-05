@@ -80,7 +80,7 @@ const Dashboard = () => {
         >
           <h1 
             data-text="NISCS"
-            className="text-5xl md:text-6xl lg:text-7xl font-light bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent drop-shadow-2xl glitch-title leading-relaxed py-2"
+            className="text-5xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent drop-shadow-2xl glitch-title leading-relaxed py-2"
           >
             NISCS
           </h1>

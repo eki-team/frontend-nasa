@@ -36,10 +36,11 @@ export const Layout = ({ children }: LayoutProps) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">
               <Link to="/" className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary to-accent shadow-lg" />
-                <span className="text-xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent drop-shadow-lg">
-                  NISCS
-                </span>
+                <img 
+                  src="/images/logo_spaceappgs.png" 
+                  alt="NISCS Logo" 
+                  className="h-12 w-auto object-contain"
+                />
               </Link>
             </div>
 
