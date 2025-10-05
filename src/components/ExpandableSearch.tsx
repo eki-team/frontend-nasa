@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, Sparkles, SlidersHorizontal, X, ChevronDown } from "lucide-react";
+import { Search, Sparkles, SlidersHorizontal, X, ChevronDown, Mic } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ export const ExpandableSearch = ({ onSearch }: ExpandableSearchProps) => {
   const { filters, setFilters } = useUiStore();
   const [isFocused, setIsFocused] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const filtersRef = useRef<HTMLDivElement>(null);
 
@@ -55,6 +56,12 @@ export const ExpandableSearch = ({ onSearch }: ExpandableSearchProps) => {
     setShowFilters(!showFilters);
   };
 
+  const handleVoiceSearch = () => {
+    setIsRecording(!isRecording);
+    // TODO: Implementar reconocimiento de voz
+    console.log("Voice search clicked");
+  };
+
   return (
     <div ref={containerRef} className="w-full max-w-4xl mx-auto">
       {/* Main Search Bar */}
@@ -88,8 +95,22 @@ export const ExpandableSearch = ({ onSearch }: ExpandableSearchProps) => {
             onClick={handleInputClick}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className="pl-14 pr-16 h-14 text-base glass-card-light border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-300 rounded-full shadow-2xl cursor-pointer placeholder:text-muted-foreground hover:border-primary/30"
+            className="pl-14 pr-28 h-14 text-base glass-card-light border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-300 rounded-full shadow-2xl cursor-pointer placeholder:text-muted-foreground hover:border-primary/30"
           />
+
+          {/* Voice Search Button */}
+          <div className="absolute right-14 z-10">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleVoiceSearch}
+              className={`h-10 w-10 rounded-full hover:bg-accent/10 border border-border/30 transition-all ${
+                isRecording ? "bg-red-500/20 border-red-500/50 animate-pulse" : ""
+              }`}
+            >
+              <Mic className={`h-4 w-4 ${isRecording ? "text-red-500" : "text-muted-foreground"}`} />
+            </Button>
+          </div>
 
           {/* Filters Toggle Button */}
           <div className="absolute right-2 z-10">

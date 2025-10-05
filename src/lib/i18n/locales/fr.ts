@@ -84,6 +84,8 @@ export const fr = {
     grounded: "Fondé",
     viewSource: "Voir la source",
     searching: "Recherche...",
+    listen: "Écouter",
+    playing: "En cours",
     pressEnter: "Appuyez sur Entrée pour rechercher",
     minChars: "Minimum 3 caractères requis"
   }

@@ -84,6 +84,8 @@ export const pt = {
     grounded: "Fundamentado",
     viewSource: "Ver fonte",
     searching: "Pesquisando...",
+    listen: "Ouvir",
+    playing: "Tocando",
     pressEnter: "Pressione Enter para pesquisar",
     minChars: "Mínimo 3 caracteres necessários"
   }

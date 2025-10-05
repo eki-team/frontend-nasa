@@ -98,6 +98,8 @@ export const en = {
     grounded: "Grounded",
     viewSource: "View Source",
     searching: "Searching...",
+    listen: "Listen",
+    playing: "Playing",
     pressEnter: "Press Enter to search",
     minChars: "Minimum 3 characters required"
   }

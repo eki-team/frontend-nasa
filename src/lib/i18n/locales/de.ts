@@ -84,6 +84,8 @@ export const de = {
     grounded: "Fundiert",
     viewSource: "Quelle anzeigen",
     searching: "Suche...",
+    listen: "Anhören",
+    playing: "Abspielen",
     pressEnter: "Drücken Sie Enter zum Suchen",
     minChars: "Mindestens 3 Zeichen erforderlich"
   }

@@ -28,19 +28,49 @@ export interface ChatRequest {
 }
 
 export interface Citation {
+  // Identificadores
+  document_id?: string;
   source_id: string;
   doi?: string;
   osdr_id?: string;
+  
+  // Contenido
   section?: string;
   snippet: string;
+  text?: string;
+  abstract?: string; // Nuevo campo: resumen del documento completo
+  
+  // URLs
   url?: string;
+  source_url?: string;
+  
+  // Publicación
   title?: string; // Puede estar aquí o en metadata
-  year?: number;
+  publication_year?: number; // Nuevo campo prioritario sobre year
+  year?: number; // Retrocompatibilidad
+  venue?: string;
+  source_type?: string;
+  
+  // Metadata biológica
   organism?: string;
-  similarity_score?: number;
-  section_boost?: number;
-  final_score?: number;
-  relevance_reason?: string;
+  system?: string;
+  mission_env?: string;
+  exposure?: string;
+  assay?: string;
+  tissue?: string;
+  
+  // Chunking info
+  chunk_index?: number;
+  total_chunks?: number;
+  created_at?: string;
+  
+  // Scoring y relevancia (nuevos campos)
+  similarity_score?: number; // Score de similitud vectorial (0-1)
+  section_boost?: number; // Boost aplicado por sección prioritaria
+  final_score?: number; // Score final = similarity + boost
+  relevance_reason?: string; // Explicación de por qué fue seleccionado
+  
+  // Metadata completa
   metadata?: {
     article_metadata?: {
       title?: string;
@@ -65,8 +95,8 @@ export interface ChatResponse {
     latency_ms: number;
     retrieved_k: number;
     grounded_ratio: number;
-    dedup_count: number;
-    section_distribution?: Record<string, number>;
+    dedup_count: number; // Nuevo campo: chunks duplicados removidos
+    section_distribution?: Record<string, number>; // Nuevo campo: distribución por sección
   };
   session_id?: string;
 }

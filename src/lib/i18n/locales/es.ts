@@ -98,6 +98,8 @@ export const es = {
     grounded: "Fundamentado",
     viewSource: "Ver Fuente",
     searching: "Buscando...",
+    listen: "Escuchar",
+    playing: "Reproduciendo",
     pressEnter: "Presiona Enter para buscar",
     minChars: "Se requieren mínimo 3 caracteres"
   }

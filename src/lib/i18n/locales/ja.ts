@@ -84,6 +84,8 @@ export const ja = {
     grounded: "根拠あり",
     viewSource: "ソースを表示",
     searching: "検索中...",
+    listen: "聞く",
+    playing: "再生中",
     pressEnter: "Enterキーを押して検索",
     minChars: "最低3文字必要"
   }
