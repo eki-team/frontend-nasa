@@ -34,8 +34,27 @@ export interface Citation {
   section?: string;
   snippet: string;
   url?: string;
-  title: string;
+  title?: string; // Puede estar aquí o en metadata
   year?: number;
+  organism?: string;
+  similarity_score?: number;
+  section_boost?: number;
+  final_score?: number;
+  relevance_reason?: string;
+  metadata?: {
+    article_metadata?: {
+      title?: string;
+      authors?: string[];
+      pmc_id?: string;
+      doi?: string;
+      url?: string;
+      scraped_at?: string;
+      statistics?: {
+        word_count?: number;
+        sections?: number;
+      };
+    };
+  };
 }
 
 export interface ChatResponse {

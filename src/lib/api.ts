@@ -55,19 +55,26 @@ const convertRagResponseToSearchResponse = (
   console.log('[API] RAG citations:', ragResponse.citations);
 
   // Convertir citations a estudios
-  const studies = ragResponse.citations.map((citation, index: number) => ({
-    id: citation.source_id || `study-${Date.now()}-${index}`,
-    title: citation.title,
-    authors: [], // Las citations no tienen authors en la respuesta RAG
-    year: citation.year || null,
-    abstract: citation.snippet,
-    mission: citation.osdr_id || undefined, // Dejar undefined si no existe
-    species: undefined, // No disponible en citations
-    outcomes: [], // No disponible en citations
-    citations: 0, 
-    doi: citation.doi || null,
-    relevanceScore: 0.95,
-  }));
+  const studies = ragResponse.citations.map((citation, index: number) => {
+    // El título y authors ahora están en metadata.article_metadata
+    const articleMetadata = (citation as any).metadata?.article_metadata;
+    const title = articleMetadata?.title || citation.title || `Study from ${citation.source_id}`;
+    const authors = articleMetadata?.authors || [];
+
+    return {
+      id: citation.source_id || `study-${Date.now()}-${index}`,
+      title,
+      authors,
+      year: citation.year || null,
+      abstract: citation.snippet,
+      mission: citation.osdr_id || undefined, // Dejar undefined si no existe
+      species: (citation as any).organism || undefined,
+      outcomes: [], // No disponible en citations
+      citations: 0, 
+      doi: citation.doi || (citation as any).metadata?.article_metadata?.doi || null,
+      relevanceScore: (citation as any).final_score || (citation as any).similarity_score || 0.95,
+    };
+  });
 
   console.log('[API] Converted studies:', studies);
 

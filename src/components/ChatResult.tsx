@@ -78,46 +78,60 @@ export const ChatResult = ({ response }: ChatResultProps) => {
           </h4>
           
           <div className="grid gap-3">
-            {response.citations.map((citation, index) => (
-              <motion.div
-                key={citation.source_id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Card className="p-4 glass-card-light border-border/50 hover:bg-accent/10 transition-all group">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center text-accent font-bold text-sm">
-                        {index + 1}
+            {response.citations.map((citation, index) => {
+              // Extraer el título desde metadata.article_metadata o usar fallback
+              const articleMetadata = (citation as any).metadata?.article_metadata;
+              const title = articleMetadata?.title || citation.title || `Source ${citation.source_id}`;
+              const authors = articleMetadata?.authors || [];
+              
+              return (
+                <motion.div
+                  key={citation.source_id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="p-4 glass-card-light border-border/50 hover:bg-accent/10 transition-all group">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center text-accent font-bold text-sm">
+                          {index + 1}
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-start justify-between gap-2">
-                        <h5 className="font-semibold group-hover:text-primary transition-colors line-clamp-2">
-                          {citation.title}
-                        </h5>
-                        {citation.year && (
-                          <Badge variant="outline" className="bg-accent/20 text-accent border-accent/30 flex-shrink-0">
-                            {citation.year}
-                          </Badge>
-                        )}
-                      </div>
+                      
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <h5 className="font-semibold group-hover:text-primary transition-colors line-clamp-2">
+                            {title}
+                          </h5>
+                          {citation.year && (
+                            <Badge variant="outline" className="bg-accent/20 text-accent border-accent/30 flex-shrink-0">
+                              {citation.year}
+                            </Badge>
+                          )}
+                        </div>
 
-                      {citation.snippet && (
-                        <p className="text-sm text-muted-foreground line-clamp-3">
-                          {citation.snippet}
-                        </p>
-                      )}
-
-                      <div className="flex flex-wrap items-center gap-2 text-xs">
-                        {citation.section && (
-                          <Badge variant="secondary" className="bg-background/50 text-muted-foreground border-border/50">
-                            {citation.section}
-                          </Badge>
+                        {/* Mostrar autores si están disponibles */}
+                        {authors.length > 0 && (
+                          <p className="text-xs text-muted-foreground">
+                            {authors.slice(0, 3).join(", ")}
+                            {authors.length > 3 && ` +${authors.length - 3} more`}
+                          </p>
                         )}
-                        {citation.osdr_id && (
+
+                        {citation.snippet && (
+                          <p className="text-sm text-muted-foreground line-clamp-3">
+                            {citation.snippet}
+                          </p>
+                        )}
+
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                          {citation.section && (
+                            <Badge variant="secondary" className="bg-background/50 text-muted-foreground border-border/50">
+                              {citation.section}
+                            </Badge>
+                          )}
+                          {citation.osdr_id && (
                           <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 border-purple-400/30">
                             {citation.osdr_id}
                           </Badge>
@@ -142,7 +156,8 @@ export const ChatResult = ({ response }: ChatResultProps) => {
                   </div>
                 </Card>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
