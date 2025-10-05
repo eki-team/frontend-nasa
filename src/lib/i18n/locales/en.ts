@@ -18,7 +18,7 @@ export const en = {
     insights: "Insights & Trends"
   },
   dashboard: {
-    title: "NASA Bioscience Publications Explorer",
+    title: "Nasa Intelligent Science Catalog Search",
     subtitle: "Explore 608 bioscience publications from NASA missions",
     searchPlaceholder: "Search by title, keywords, species, or mission...",
     totalStudies: "Total Studies",
