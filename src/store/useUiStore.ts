@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { SearchFilters } from "@/lib/types";
+import { ChatResponse } from "@/lib/api-rag";
 
 export type LanguageCode = "en" | "es" | "fr" | "de" | "pt" | "ja" | "it";
 
@@ -24,6 +25,11 @@ interface UiState {
   // UI state
   sidebarOpen: boolean;
   toggleSidebar: () => void;
+  
+  // Chat RAG state (persiste entre navegaciones)
+  currentChatResponse: ChatResponse | null;
+  setCurrentChatResponse: (response: ChatResponse | null) => void;
+  clearChatResponse: () => void;
 }
 
 const defaultFilters: SearchFilters = {
@@ -51,13 +57,19 @@ export const useUiStore = create<UiState>()(
       setSelectedNode: (nodeId) => set({ selectedNode: nodeId }),
       
       sidebarOpen: true,
-      toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen }))
+      toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+      
+      // Chat RAG state
+      currentChatResponse: null,
+      setCurrentChatResponse: (response) => set({ currentChatResponse: response }),
+      clearChatResponse: () => set({ currentChatResponse: null })
     }),
     {
       name: "nasa-bio-ui-store",
       partialize: (state) => ({
         theme: state.theme,
-        language: state.language
+        language: state.language,
+        currentChatResponse: state.currentChatResponse // Persistir respuesta del chat
       })
     }
   )

@@ -4,7 +4,7 @@ import { chatQuery, ChatRequest, ChatResponse } from "@/lib/api-rag";
 import { useUiStore } from "@/store/useUiStore";
 
 export const useChatRag = () => {
-  const { filters } = useUiStore();
+  const { filters, currentChatResponse, setCurrentChatResponse } = useUiStore();
   const [chatHistory, setChatHistory] = useState<ChatResponse[]>([]);
 
   const chatMutation = useMutation({
@@ -41,8 +41,10 @@ export const useChatRag = () => {
       return chatQuery(request);
     },
     onSuccess: (data) => {
-      // Guardar en historial
+      // Guardar en historial local
       setChatHistory((prev) => [...prev, data]);
+      // Guardar en store global (persiste entre navegaciones)
+      setCurrentChatResponse(data);
     },
   });
 
@@ -55,6 +57,7 @@ export const useChatRag = () => {
 
   const clearHistory = () => {
     setChatHistory([]);
+    setCurrentChatResponse(null); // Limpiar también del store
   };
 
   return {
@@ -63,6 +66,6 @@ export const useChatRag = () => {
     chatHistory,
     isLoading: chatMutation.isPending,
     error: chatMutation.error,
-    currentResponse: chatMutation.data,
+    currentResponse: currentChatResponse || chatMutation.data, // Usar store como fuente primaria
   };
 };
