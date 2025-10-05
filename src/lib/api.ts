@@ -51,20 +51,25 @@ const convertRagResponseToSearchResponse = (
   const page = filters.page || 1;
   const pageSize = filters.pageSize || 12;
 
+  console.log('[API] Converting RAG response to search response');
+  console.log('[API] RAG citations:', ragResponse.citations);
+
   // Convertir citations a estudios
   const studies = ragResponse.citations.map((citation, index: number) => ({
-    id: citation.source_id || `study-${Date.now()}-${index}`, // ID temporal
+    id: citation.source_id || `study-${Date.now()}-${index}`,
     title: citation.title,
-    authors: [], // Las citations no tienen authors en la nueva estructura
+    authors: [], // Las citations no tienen authors en la respuesta RAG
     year: citation.year || null,
     abstract: citation.snippet,
-    mission: citation.osdr_id || filters.mission || "Unknown",
-    species: filters.species?.[0] || "Unknown",
-    outcomes: filters.outcome || [],
-    citations: 0, // Mock 
+    mission: citation.osdr_id || undefined, // Dejar undefined si no existe
+    species: undefined, // No disponible en citations
+    outcomes: [], // No disponible en citations
+    citations: 0, 
     doi: citation.doi || null,
-    relevanceScore: 0.95, // Mock score
+    relevanceScore: 0.95,
   }));
+
+  console.log('[API] Converted studies:', studies);
 
   return {
     studies,
